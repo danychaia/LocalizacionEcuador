@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<factura id="comprobante" version="2.0.0">
+  <infoTributaria>
+    <ambiente>1</ambiente>
+    <tipoEmision>1</tipoEmision>
+    <razonSocial>Distribuidora de Suministros Nacional S.A.</razonSocial>
+    <ruc>1792146739001</ruc>
+    <claveAcesso>1811201601179214673900110010010000000030000000317</claveAcesso>
+    <codDoc>01</codDoc>
+    <estab>001</estab>
+    <ptoEmi>001</ptoEmi>
+    <secuencial>000000003</secuencial>
+    <dirMatriz>Enrique Guerrero Portilla OE1-34 AV. Galo Plaza Lasso</dirMatriz>
+  </infoTributaria>
+  <infoFactura>
+    <fechaEmision>18-11-2016</fechaEmision>
+    <tipoIdentificacionComprador>04</tipoIdentificacionComprador>
+    <razonSocialComprador>RAZONSOCIALPRUEBA</razonSocialComprador>
+    <identificacionComprador>1234687123548</identificacionComprador>
+    <totalSinImpuestos>584</totalSinImpuestos>
+    <totalDescuento>50.399999</totalDescuento>
+    <totalConImpuestos>
+      <totalImpuesto>
+        <codigo>2</codigo>
+        <codigoPorcentaje>2</codigoPorcentaje>
+        <baseImponible>504</baseImponible>
+        <valor>504</valor>
+      </totalImpuesto>
+      <totalImpuesto>
+        <codigo>2</codigo>
+        <codigoPorcentaje>2</codigoPorcentaje>
+        <baseImponible>80</baseImponible>
+        <valor>80</valor>
+      </totalImpuesto>
+    </totalConImpuestos>
+    <importeTotal>644.48</importeTotal>
+  </infoFactura>
+  <detalles>
+    <detalle>
+      <descripcion>1199-Resma de hojas oficio</descripcion>
+      <cantidad>8</cantidad>
+      <precioUnitario>63</precioUnitario>
+      <descuento>10</descuento>
+      <precioTotalSinImpuesto>504</precioTotalSinImpuesto>
+      <impuestos>
+        <impuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>2</codigoPorcentaje>
+          <tarifa>12</tarifa>
+          <baseImponible>504</baseImponible>
+          <valor>504</valor>
+        </impuesto>
+      </impuestos>
+    </detalle>
+    <detalle>
+      <descripcion>1206-Libro de Actas</descripcion>
+      <cantidad>1</cantidad>
+      <precioUnitario>80</precioUnitario>
+      <descuento>0</descuento>
+      <precioTotalSinImpuesto>80</precioTotalSinImpuesto>
+      <impuestos>
+        <impuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>2</codigoPorcentaje>
+          <tarifa>12</tarifa>
+          <baseImponible>80</baseImponible>
+          <valor>80</valor>
+        </impuesto>
+      </impuestos>
+    </detalle>
+  </detalles>
+</factura>
