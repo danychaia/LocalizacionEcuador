@@ -229,6 +229,8 @@ Public Class fact_compro
                             createNode("codigoPorcentaje", oRecord.Fields.Item(1).Value.ToString, writer)
                             createNode("baseImponible", oRecord.Fields.Item(2).Value.ToString, writer)
                             createNode("valor", oRecord.Fields.Item(2).Value.ToString, writer)
+                            createNode("baseNoGraIva", Double.Parse("0.00").ToString, writer)
+                            createNode("baseImponible", "", writer)
                             writer.WriteEndElement()
                             oRecord.MoveNext()
                         End While

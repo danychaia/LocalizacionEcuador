@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<iva>
+  <TipoIDInformante>R</TipoIDInformante>
+  <IdInformante>179241077001</IdInformante>
+  <razonSocial>ZUBERTECH ENLACE DIGITAL S.A.</razonSocial>
+  <Anio>2016</Anio>
+  <Mes>12</Mes>
+  <numEstabRuc>001</numEstabRuc>
+  <totalVentas />
+  <codigoOperativo>IVA</codigoOperativo>
+  <compras>
+    <detalleCompras>
+      <codSustento />
+      <tpIdProv />
+      <idProv />
+      <tipoComprobante />
+      <parteRel>NO</parteRel>
+      <fechaRegistro>01/01/2011</fechaRegistro>
+      <establecimiento />
+      <puntoEmision />
+      <secuencial>1</secuencial>
+      <fechaEmision>01/01/2011</fechaEmision>
+      <autorizacion />
+    </detalleCompras>
+    <detalleCompras>
+      <codSustento />
+      <tpIdProv />
+      <idProv />
+      <tipoComprobante />
+      <parteRel>NO</parteRel>
+      <fechaRegistro>07/01/2011</fechaRegistro>
+      <establecimiento />
+      <puntoEmision />
+      <secuencial>2</secuencial>
+      <fechaEmision>07/01/2011</fechaEmision>
+      <autorizacion />
+    </detalleCompras>
+    <detalleCompras>
+      <codSustento />
+      <tpIdProv />
+      <idProv />
+      <tipoComprobante />
+      <parteRel>NO</parteRel>
+      <fechaRegistro>07/01/2011</fechaRegistro>
+      <establecimiento />
+      <puntoEmision />
+      <secuencial>3</secuencial>
+      <fechaEmision>07/01/2011</fechaEmision>
+      <autorizacion />
+    </detalleCompras>
+  </compras>
+</iva>

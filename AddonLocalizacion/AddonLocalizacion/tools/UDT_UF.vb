@@ -36,19 +36,10 @@
                 End If
 
                 If validation = True Then
-                    oUserFieldsMD.ValidValues.Value = "04"
-                    oUserFieldsMD.ValidValues.Description = "RUC"
-                    oUserFieldsMD.ValidValues.Add()
-                    oUserFieldsMD.ValidValues.Value = "05"
-                    oUserFieldsMD.ValidValues.Description = "CEDULA"
-                    oUserFieldsMD.ValidValues.Add()
-
-                    oUserFieldsMD.ValidValues.Value = "06"
-                    oUserFieldsMD.ValidValues.Description = "CEDULA"
+                    oUserFieldsMD.ValidValues.Value = "1"
+                    oUserFieldsMD.ValidValues.Description = "INICIO"
                     oUserFieldsMD.ValidValues.Add()
                 End If
-
-
                 If oUserFieldsMD.Add() <> 0 Then
                     oCompany.GetLastError(num, err)
                     SBO_app.SetStatusBarMessage(num & " " & err, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
@@ -56,6 +47,7 @@
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(oUserFieldsMD)
             End If
 
+            GC.Collect()
         Catch ex As Exception
             SBO_app.SetStatusBarMessage(ex.Message & "  " & num & " " & err, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
         End Try
@@ -130,4 +122,47 @@
             Throw New Exception(ex.Message)
         End Try
     End Function
+
+
+    Public Function updateUserField(oCompany As SAPbobsCOM.Company, tableName As String, namefield As String, validArray As ArrayList) As Boolean
+
+        Dim existe As Boolean = False
+        Dim record As SAPbobsCOM.Recordset
+
+        Dim eler As Integer = 0
+        Dim mensa As String = ""
+
+        record = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+        Dim sql = "SELECT a.FieldID   FROM CUFD a WHERE TableID = '" & tableName & "' AND AliasID = '" & namefield & "'"
+        record.DoQuery(sql)
+        If record.RecordCount > 0 Then
+
+            Dim oFielID = record.Fields.Item("FieldID").Value
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(record)
+            record = Nothing
+            GC.Collect()
+            Dim oUserField As SAPbobsCOM.UserFieldsMD
+            oUserField = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oUserFields)
+            If oUserField.GetByKey(tableName, oFielID) Then
+
+                For Each lista As validValues In validArray
+                    oUserField.ValidValues.Value = lista.value
+                    oUserField.ValidValues.Description = lista.descrip
+                    oUserField.ValidValues.Add()
+                Next
+                If oUserField.Update() <> 0 Then
+                    oCompany.GetLastError(eler, mensa)
+                    SBOApplication.SetStatusBarMessage(mensa, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+                End If
+            End If
+
+        End If
+
+
+
+        Return existe
+    End Function
+
+  
+
 End Module

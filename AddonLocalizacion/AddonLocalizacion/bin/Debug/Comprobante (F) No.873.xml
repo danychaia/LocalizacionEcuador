@@ -3,14 +3,14 @@
   <infoTributaria>
     <ambiente>1</ambiente>
     <tipoEmision>1</tipoEmision>
-    <razonSocial>Distribuidora de Suministros Nacional S.A.</razonSocial>
-    <ruc>1792146739001</ruc>
-    <claveAcesso>1811201601179214673900110010010000000020000000212</claveAcesso>
+    <razonSocial>asdf</razonSocial>
+    <ruc>0000000000000</ruc>
+    <claveAcesso>1811201601000000000000010010010000000020000000216</claveAcesso>
     <codDoc>01</codDoc>
-    <estab>001</estab>
-    <ptoEmi>001</ptoEmi>
+    <estab>000</estab>
+    <ptoEmi>000</ptoEmi>
     <secuencial>000000002</secuencial>
-    <dirMatriz>Enrique Guerrero Portilla OE1-34 AV. Galo Plaza Lasso</dirMatriz>
+    <dirMatriz>sfa</dirMatriz>
   </infoTributaria>
   <infoFactura>
     <fechaEmision>18-11-2016</fechaEmision>

@@ -14,18 +14,21 @@
             Dim ruc As SAPbouiCOM.EditText
             Dim estable As SAPbouiCOM.EditText
             Dim ptoEmisor As SAPbouiCOM.EditText
+            Dim ofolder As SAPbouiCOM.Folder
             If UDT_UF.ActivateFormIsOpen(SBO_Application, "frm_inf") = False Then
                 LoadFromXML(XmlForm)
                 oForm = SBO_Application.Forms.Item("frm_inf")
                 oForm.Visible = True
-                oForm.PaneLevel = 1
-                oForm.Left = 20
+                'oForm.PaneLevel = 1
+                'oForm.Left = 20
                 ruc = oForm.Items.Item("txtruc").Specific
                 ruc.Value = "0".PadRight(13, "0")
                 estable = oForm.Items.Item("Item_10").Specific
                 ptoEmisor = oForm.Items.Item("Item_12").Specific
                 estable.Value = "0".PadRight(3, "0")
                 ptoEmisor.Value = "0".PadRight(3, "0")
+                ofolder = oForm.Items.Item("Item_21").Specific
+                ofolder.Select()
             Else
                 oForm = Me.SBO_Application.Forms.Item("frm_inf")
                 ruc = oForm.Items.Item("txtruc").Specific
@@ -69,20 +72,35 @@
                 If pVal.ItemUID = "btnGuardar" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED And pVal.Before_Action = True Then
                     Dim comboA As SAPbouiCOM.ComboBox
                     Dim comboE As SAPbouiCOM.ComboBox
+                    Dim identi As SAPbouiCOM.ComboBox
+                    Dim conta As SAPbouiCOM.ComboBox
                     Dim razon As SAPbouiCOM.EditText
                     Dim nombre As SAPbouiCOM.EditText
                     Dim estable As SAPbouiCOM.EditText
                     Dim ptoEmisor As SAPbouiCOM.EditText
                     Dim direccion As SAPbouiCOM.EditText
+                    Dim ci As SAPbouiCOM.EditText
                     Dim ruc As SAPbouiCOM.EditText
+                    Dim dina As SAPbouiCOM.EditText
+                    Dim rucct As SAPbouiCOM.EditText
+                    Dim contri As SAPbouiCOM.EditText
+                    Dim especial As SAPbouiCOM.EditText
+                    
                     comboA = oForm.Items.Item("cboAmb").Specific
                     comboE = oForm.Items.Item("cboEmi").Specific
+                    identi = oForm.Items.Item("Item_0").Specific
+                    conta = oForm.Items.Item("Item_1").Specific
                     razon = oForm.Items.Item("Item_5").Specific
                     nombre = oForm.Items.Item("Item_7").Specific
                     estable = oForm.Items.Item("Item_10").Specific
                     ptoEmisor = oForm.Items.Item("Item_12").Specific
                     direccion = oForm.Items.Item("Item_14").Specific
                     ruc = oForm.Items.Item("txtruc").Specific
+                    ci = oForm.Items.Item("txtCI").Specific
+                    dina = oForm.Items.Item("Item_43").Specific
+                    rucct = oForm.Items.Item("rucct").Specific
+                    contri = oForm.Items.Item("contri").Specific
+                    especial = oForm.Items.Item("numcte").Specific
                     If comboA.Value.Equals("") Then
                         Me.SBO_Application.SetStatusBarMessage("Debe de seleccionar un ambiente", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                         BubbleEvent = False
@@ -140,11 +158,75 @@
                             Me.SBO_Application.SetStatusBarMessage("RUC no válido, 13 digitos permitidos", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                             BubbleEvent = False
                             Return
+                        Else
+                            Try
+                                Long.Parse(ruc.Value)
+                            Catch ex As Exception
+                                Me.SBO_Application.SetStatusBarMessage("RUC no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                BubbleEvent = False
+                                Return
+                            End Try
                         End If
                     End If
+                    If ci.Value = "" Then
+                        Me.SBO_Application.SetStatusBarMessage("C.I. no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                        BubbleEvent = False
+                        Return
+                    Else
+                        If ci.Value.Count <> 10 Then
+                            Me.SBO_Application.SetStatusBarMessage("C.I. no válido solo 10 digitos", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                            BubbleEvent = False
+                            Return
+                        Else
+                            Try
+                                Long.Parse(ci.Value)
+                            Catch ex As Exception
+                                Me.SBO_Application.SetStatusBarMessage("C.I. no válido solo dígitos", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                BubbleEvent = False
+                                Return
+                            End Try
+                        End If
+                    End If
+                    If dina.Value = "" Then
+                        Me.SBO_Application.SetStatusBarMessage("Debe de ingresar un Código DINARDAP", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                        BubbleEvent = False
+                        Return
+                    End If
+                    If identi.Value.Trim = "" Then
+                        Me.SBO_Application.SetStatusBarMessage("Debe de ingresar un tipo de identificación", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                        BubbleEvent = False
+                        Return
+                    End If
+
+                    If rucct.Value.Equals("") Then
+                        Me.SBO_Application.SetStatusBarMessage("Debe de escribir un RUC cliente", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                        BubbleEvent = False
+                        Return
+                    Else
+                        If rucct.Value.ToString.Count <> 13 Then
+                            Me.SBO_Application.SetStatusBarMessage("RUC cliente no válido, 13 digitos permitidos", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                            BubbleEvent = False
+                            Return
+                        Else
+                            Try
+                                Long.Parse(rucct.Value)
+                            Catch ex As Exception
+                                Me.SBO_Application.SetStatusBarMessage("RUC cliente no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                BubbleEvent = False
+                                Return
+                            End Try
+                        End If
+                    End If
+
+                    If conta.Value.Trim = "" Then
+                        Me.SBO_Application.SetStatusBarMessage("Obligado a llevar contabilidad no seleccionado", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                        BubbleEvent = False
+                        Return
+                    End If
+
                     Dim orecord As SAPbobsCOM.Recordset
                     orecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-                    Dim sql As String = "Exec INSERTAR_INFOR_TRIBUTARIA " & comboA.Value & "," & comboE.Value & ",'" & razon.Value & "','" & nombre.Value & "','" & estable.Value & "','" & ptoEmisor.Value & "','" & direccion.Value & "','" & ruc.Value & "'"
+                    Dim sql As String = "Exec INSERTAR_INFOR_TRIBUTARIA " & comboA.Value & "," & comboE.Value & ",'" & razon.Value & "','" & nombre.Value & "','" & estable.Value & "','" & ptoEmisor.Value & "','" & direccion.Value & "','" & ruc.Value & "','" & ci.Value & "','" & dina.Value & "','" & identi.Value & "','" & rucct.Value & "','" & contri.Value & "','" & especial.Value & "','" & conta.Value & "','" & oCompany.CompanyName & "'"
                     orecord.DoQuery(sql)
                     System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
                     orecord = Nothing
@@ -170,6 +252,15 @@
             Dim ptoEmisor As SAPbouiCOM.EditText
             Dim direccion As SAPbouiCOM.EditText
             Dim ruc As SAPbouiCOM.EditText
+            Dim identi As SAPbouiCOM.ComboBox
+            Dim conta As SAPbouiCOM.ComboBox
+            Dim ci As SAPbouiCOM.EditText
+            Dim dina As SAPbouiCOM.EditText
+            Dim rucct As SAPbouiCOM.EditText
+            Dim contri As SAPbouiCOM.EditText
+            Dim especial As SAPbouiCOM.EditText
+            identi = oForm.Items.Item("Item_0").Specific
+            conta = oForm.Items.Item("Item_1").Specific
             comboA = oForm.Items.Item("cboAmb").Specific
             comboE = oForm.Items.Item("cboEmi").Specific
             razon = oForm.Items.Item("Item_5").Specific
@@ -178,6 +269,11 @@
             ptoEmisor = oForm.Items.Item("Item_12").Specific
             direccion = oForm.Items.Item("Item_14").Specific
             ruc = oForm.Items.Item("txtruc").Specific
+            ci = oForm.Items.Item("txtCI").Specific
+            dina = oForm.Items.Item("Item_43").Specific
+            rucct = oForm.Items.Item("rucct").Specific
+            contri = oForm.Items.Item("contri").Specific
+            especial = oForm.Items.Item("numcte").Specific
             orecord.DoQuery("select * from [@INF_TRIBUTARIA]")
             If orecord.RecordCount > 0 Then
                 While orecord.EoF = False
@@ -191,6 +287,13 @@
                     ptoEmisor.Value = orecord.Fields.Item("U_PTO_EMISOR").Value
                     direccion.Value = orecord.Fields.Item("U_DIRECCION").Value
                     ruc.Value = orecord.Fields.Item("U_RUC").Value
+                    ci.Value = orecord.Fields.Item("U_CI").Value
+                    dina.Value = orecord.Fields.Item("U_COD_DINARDAP").Value
+                    identi.Select(orecord.Fields.Item("U_TIP_IDENT").Value.ToString, SAPbouiCOM.BoSearchKey.psk_ByValue)
+                    rucct.Value = orecord.Fields.Item("U_RUC_CLIENTE").Value
+                    contri.Value = orecord.Fields.Item("U_CLS_CONTRIBU").Value
+                    especial.Value = orecord.Fields.Item("U_CLS_CONTRIBU_NUM").Value
+                    conta.Select(orecord.Fields.Item("U_CONTA").Value.ToString, SAPbouiCOM.BoSearchKey.psk_ByValue)
                     orecord.MoveNext()
                 End While
             End If
