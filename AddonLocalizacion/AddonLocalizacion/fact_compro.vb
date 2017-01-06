@@ -19,7 +19,7 @@ Public Class fact_compro
                 oForm = SBO_Application.Forms.Item("frmCfac")
                 oForm.Visible = True
                 oForm.PaneLevel = 1
-
+                oForm.Left = 419
                 Dim inicio As SAPbouiCOM.EditText
                 Dim fin As SAPbouiCOM.EditText
                 Dim cmdenviar As SAPbouiCOM.Button
@@ -87,7 +87,7 @@ Public Class fact_compro
 
     Private Sub SBO_Application_ItemEvent(ByVal FormUID As String, ByRef pVal As SAPbouiCOM.ItemEvent, ByRef BubbleEvent As Boolean) Handles SBO_Application.ItemEvent
         Try
-            If pVal.FormTypeEx = "60004" And pVal.Before_Action = True Then
+            If pVal.FormTypeEx = "60004" And pVal.Before_Action = True And pVal.FormUID = "frmCfac" Then
                 If pVal.ItemUID = "btn_Buscar" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED And pVal.Before_Action = True Then
                     Dim ini As SAPbouiCOM.EditText
                     Dim fin As SAPbouiCOM.EditText
@@ -115,7 +115,7 @@ Public Class fact_compro
                     BubbleEvent = False
                 End If
 
-               
+
                 If pVal.ItemUID = "bt_pro" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED Then
                     generarXML()
                 End If
@@ -172,9 +172,11 @@ Public Class fact_compro
             Dim doc As New XmlDocument
             Dim Nodo As XmlNode
             Dim oRecord As SAPbobsCOM.Recordset
+            Dim oProgressive As SAPbouiCOM.ProgressBar
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
             grd = oForm.Items.Item("txtGridFac").Specific
             If grd.Rows.Count > 0 Then
+                oProgressive = SBO_Application.StatusBar.CreateProgressBar("Generando Retencion de :", grd.Rows.Count, True)
                 For i = 0 To grd.Rows.Count - 1
                     Dim docEntry = grd.DataTable.GetValue(grd.DataTable.Columns.Item(0).Name, i)
                     oRecord.DoQuery("exec ENCABEZADO_FACTURA '" & docEntry & "'")
@@ -249,10 +251,10 @@ Public Class fact_compro
                     writer.WriteStartElement("detalles")
                     oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
                     oRecord.DoQuery("exec sp_DetalleFac '" & docEntry & "'")
-                    
+
 
                     If oRecord.RecordCount > 0 Then
-                       
+
                         While oRecord.EoF = False
                             Dim oRecord2 As SAPbobsCOM.Recordset
                             oRecord2 = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
@@ -286,14 +288,17 @@ Public Class fact_compro
                             oRecord.MoveNext()
                         End While
                     End If
-                    
+
                     ''Cierre detalles
                     writer.WriteEndElement()
                     ''Cierre Factura
                     writer.WriteEndElement()
                     writer.WriteEndDocument()
                     writer.Close()
+                    oProgressive.Value += 1
                 Next
+                oProgressive.Stop()
+                oProgressive = Nothing
             End If
         Catch ex As Exception
             Me.SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, False)

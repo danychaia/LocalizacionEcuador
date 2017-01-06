@@ -10,6 +10,9 @@
     End Property
 
     Private _Company As SAPbobsCOM.Company
+    Public docEntry As String
+    Public code As String = ""
+
     Public Property Company() As SAPbobsCOM.Company
         Get
             Return _Company

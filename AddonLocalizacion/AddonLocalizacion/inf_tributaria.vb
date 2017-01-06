@@ -18,9 +18,7 @@
             If UDT_UF.ActivateFormIsOpen(SBO_Application, "frm_inf") = False Then
                 LoadFromXML(XmlForm)
                 oForm = SBO_Application.Forms.Item("frm_inf")
-                oForm.Visible = True
-                'oForm.PaneLevel = 1
-                'oForm.Left = 20
+                oForm.Visible = True               
                 ruc = oForm.Items.Item("txtruc").Specific
                 ruc.Value = "0".PadRight(13, "0")
                 estable = oForm.Items.Item("Item_10").Specific
@@ -68,7 +66,7 @@
 
     Private Sub SBO_Application_ItemEvent(ByVal FormUID As String, ByRef pVal As SAPbouiCOM.ItemEvent, ByRef BubbleEvent As Boolean) Handles SBO_Application.ItemEvent
         Try
-            If (pVal.FormTypeEx = "60006" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED And pVal.BeforeAction = True) Then
+            If (pVal.FormTypeEx = "60006" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED And pVal.BeforeAction = True And pVal.FormUID = "frm_inf") Then
                 If pVal.ItemUID = "btnGuardar" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED And pVal.Before_Action = True Then
                     Dim comboA As SAPbouiCOM.ComboBox
                     Dim comboE As SAPbouiCOM.ComboBox
@@ -85,7 +83,7 @@
                     Dim rucct As SAPbouiCOM.EditText
                     Dim contri As SAPbouiCOM.EditText
                     Dim especial As SAPbouiCOM.EditText
-                    
+
                     comboA = oForm.Items.Item("cboAmb").Specific
                     comboE = oForm.Items.Item("cboEmi").Specific
                     identi = oForm.Items.Item("Item_0").Specific
@@ -131,7 +129,7 @@
                             BubbleEvent = False
                             Return
                         End If
-                       
+
                     End If
                     If ptoEmisor.Value.Equals("") Then
                         Me.SBO_Application.SetStatusBarMessage("Debe de seleccionar un Emisor", SAPbouiCOM.BoMessageTime.bmt_Short, True)
@@ -162,10 +160,39 @@
                             Try
                                 Long.Parse(ruc.Value)
                             Catch ex As Exception
-                                Me.SBO_Application.SetStatusBarMessage("RUC no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                Me.SBO_Application.SetStatusBarMessage("RUC no válido no pertime caracteres especiales", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                                 BubbleEvent = False
                                 Return
                             End Try
+                            If ruc.Value.EndsWith("001") = False Then
+                                Me.SBO_Application.SetStatusBarMessage("RUC no válido al finalizar", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                BubbleEvent = False
+                                Return
+                            End If
+                            Dim claserum = Integer.Parse(ruc.Value.ToString.Chars(2))
+                            If claserum = 6 Then
+                                If digitoVerificadorPublico(ruc.Value, Me.SBO_Application, False) = False Then
+                                    Me.SBO_Application.SetStatusBarMessage("RUC contador. no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                    BubbleEvent = False
+                                    Return
+                                End If
+                            Else
+                                If claserum = 9 Then
+                                    If digitoVerificador(ruc.Value.Trim, Me.SBO_Application, False) = False Then
+                                        Me.SBO_Application.SetStatusBarMessage("RUC contador. no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                        BubbleEvent = False
+                                        Return
+                                    End If
+                                Else
+                                    If digitoVerificadorIndividual(ruc.Value, Me.SBO_Application, False) = False Then
+                                        Me.SBO_Application.SetStatusBarMessage("RUC contador. no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                        BubbleEvent = False
+                                        Return
+                                    End If
+                                End If
+
+                            End If
+
                         End If
                     End If
                     If ci.Value = "" Then
@@ -181,43 +208,101 @@
                             Try
                                 Long.Parse(ci.Value)
                             Catch ex As Exception
-                                Me.SBO_Application.SetStatusBarMessage("C.I. no válido solo dígitos", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                Me.SBO_Application.SetStatusBarMessage("C.I. no válido solo dígitos permitidos", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                                 BubbleEvent = False
                                 Return
                             End Try
-                        End If
-                    End If
-                    If dina.Value = "" Then
-                        Me.SBO_Application.SetStatusBarMessage("Debe de ingresar un Código DINARDAP", SAPbouiCOM.BoMessageTime.bmt_Short, True)
-                        BubbleEvent = False
-                        Return
-                    End If
-                    If identi.Value.Trim = "" Then
-                        Me.SBO_Application.SetStatusBarMessage("Debe de ingresar un tipo de identificación", SAPbouiCOM.BoMessageTime.bmt_Short, True)
-                        BubbleEvent = False
-                        Return
-                    End If
 
-                    If rucct.Value.Equals("") Then
-                        Me.SBO_Application.SetStatusBarMessage("Debe de escribir un RUC cliente", SAPbouiCOM.BoMessageTime.bmt_Short, True)
-                        BubbleEvent = False
-                        Return
-                    Else
-                        If rucct.Value.ToString.Count <> 13 Then
-                            Me.SBO_Application.SetStatusBarMessage("RUC cliente no válido, 13 digitos permitidos", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                            If ci.Value = "0000000000" Then
+                                Me.SBO_Application.SetStatusBarMessage("C.I. no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                BubbleEvent = False
+                                Return
+                            End If
+
+                            Dim claseci = Integer.Parse(ci.Value.ToString.Chars(2))
+                            If claseci = 6 Then
+                                If digitoVerificadorPublico(ci.Value, Me.SBO_Application, True) = False Then
+                                    Me.SBO_Application.SetStatusBarMessage("C.I. no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                    BubbleEvent = False
+                                    Return
+                                End If
+                            Else
+                                If claseci = 9 Then
+                                    If digitoVerificador(ci.Value, Me.SBO_Application, True) = False Then
+                                        Me.SBO_Application.SetStatusBarMessage("C.I. no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                        BubbleEvent = False
+                                        Return
+                                    End If
+                                Else
+                                    If digitoVerificadorIndividual(ci.Value, Me.SBO_Application, True) = False Then
+                                        Me.SBO_Application.SetStatusBarMessage("C.I. no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                        BubbleEvent = False
+                                        Return
+                                    End If
+                                End If
+
+                            End If
+                        End If
+                        If dina.Value = "" Then
+                            Me.SBO_Application.SetStatusBarMessage("Debe de ingresar un Código DINARDAP", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                            BubbleEvent = False
+                            Return
+                        End If
+                        If identi.Value.Trim = "" Then
+                            Me.SBO_Application.SetStatusBarMessage("Debe de ingresar un tipo de identificación", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                            BubbleEvent = False
+                            Return
+                        End If
+
+                        If rucct.Value.Equals("") Then
+                            Me.SBO_Application.SetStatusBarMessage("Debe de escribir un RUC cliente", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                             BubbleEvent = False
                             Return
                         Else
-                            Try
-                                Long.Parse(rucct.Value)
-                            Catch ex As Exception
-                                Me.SBO_Application.SetStatusBarMessage("RUC cliente no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                            If rucct.Value.ToString.Count <> 13 Then
+                                Me.SBO_Application.SetStatusBarMessage("RUC cliente no válido, 13 digitos permitidos", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                                 BubbleEvent = False
                                 Return
-                            End Try
+                            Else
+                                Try
+                                    Long.Parse(rucct.Value)
+                                Catch ex As Exception
+                                    Me.SBO_Application.SetStatusBarMessage("RUC cliente no válido no se permiten caracteres especiales", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                    BubbleEvent = False
+                                    Return
+                                End Try
+                                If rucct.Value.EndsWith("001") = False Then
+                                    Me.SBO_Application.SetStatusBarMessage("RUC no válido al finalizar", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                    BubbleEvent = False
+                                    Return
+                                End If
+                                Dim claseRuc = Integer.Parse(rucct.Value.ToString.Chars(2))
+
+                                If claseRuc = 6 Then
+                                    If digitoVerificadorPublico(rucct.Value, Me.SBO_Application, False) = False Then
+                                        Me.SBO_Application.SetStatusBarMessage("RUC no válido para cliente", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                        BubbleEvent = False
+                                        Return
+                                    End If
+                                Else
+                                    If claseRuc = 9 Then
+
+                                        If digitoVerificador(rucct.Value, Me.SBO_Application, False) = False Then
+                                            Me.SBO_Application.SetStatusBarMessage("RUC no válido para cliente", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                            BubbleEvent = False
+                                            Return
+                                        End If
+                                    Else
+                                        If digitoVerificadorIndividual(rucct.Value, Me.SBO_Application, False) = False Then
+                                            Me.SBO_Application.SetStatusBarMessage("RUC no válido para cliente")
+                                            BubbleEvent = False
+                                            Return
+                                        End If
+                                    End If
+                                End If
+                            End If
                         End If
                     End If
-
                     If conta.Value.Trim = "" Then
                         Me.SBO_Application.SetStatusBarMessage("Obligado a llevar contabilidad no seleccionado", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                         BubbleEvent = False
@@ -233,6 +318,7 @@
                     GC.Collect()
                     SBO_Application.SetStatusBarMessage("Informacion Guardada", SAPbouiCOM.BoMessageTime.bmt_Short, False)
                     BubbleEvent = False
+                    Return
                 End If
             End If
         Catch ex As Exception
@@ -306,4 +392,155 @@
         GC.Collect()
     End Sub
 
+
+    Private Function digitoVerificadorPublico(rucnum As String, application As SAPbouiCOM.Application, cedula As Boolean) As Boolean
+        Dim bandera As Boolean = True
+        Dim provincia = rucnum.Chars(0) & rucnum.Chars(1)
+        If provincia <= 0 And provincia >= 23 Then
+            SBO_Application.SetStatusBarMessage("Error provincia no válida", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            Return bandera = False
+        End If
+        If rucnum.Chars(2) <> "6" Then
+            application.SetStatusBarMessage("Error en el 3er Digito debe ser 6", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            Return bandera = False
+        End If
+        Dim pivote As Integer = 2
+        Dim cantidadTotal As Integer = 0
+        For i As Integer = 7 To 0 Step -1
+            If pivote = 8 Then
+                pivote = 2
+            End If
+            Dim temporal = Integer.Parse(rucnum.Chars(i))
+            temporal *= pivote
+            pivote += 1
+            cantidadTotal += temporal
+        Next
+        If (cantidadTotal Mod 11) = 0 Then
+            cantidadTotal = 0
+        Else
+            cantidadTotal = 11 - (cantidadTotal Mod 11)
+        End If
+        If cantidadTotal.ToString = rucnum.Chars(8) Then
+            If cedula = False Then
+                If rucnum.EndsWith("001") = False Then
+                    'application.SetStatusBarMessage("El numero de RUC no es válido en Principal o Sucursal ", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+                    Return bandera = False
+                End If
+
+            Else
+                'application.SetStatusBarMessage("RUC válido", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            End If
+        Else
+            'application.SetStatusBarMessage("RUC no válido digito verficador no es corrrecto", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            Return bandera = False
+        End If
+        Return bandera = True
+    End Function
+    Private Function digitoVerificadorIndividual(rucnum As String, application As SAPbouiCOM.Application, cedula As Boolean) As Boolean
+        Dim bandera As Boolean = True
+        Dim provincia = rucnum.Chars(0) & rucnum.Chars(1)
+        If provincia >= 0 Then
+            If provincia <= 22 Then
+            Else
+                ' SBO_Application.SetStatusBarMessage("Error provincia no válida", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+                Return bandera = False
+            End If
+        Else
+            'SBO_Application.SetStatusBarMessage("Error provincia no válida", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            Return bandera = False
+        End If
+        If Integer.Parse(rucnum.Chars(2)) >= 0 And Integer.Parse(rucnum.Chars(2)) <= 5 Then
+        Else
+            'application.SetStatusBarMessage("Error en el 3er Digito debe de estar en el rango de 1 a 5", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            Return bandera = False
+        End If
+        Dim pivote As Integer = 2
+        Dim cantidadTotal As Integer = 0
+        For i As Integer = 8 To 0 Step -1
+            If pivote = 0 Then
+                pivote = 2
+            End If
+            Dim temporal = Integer.Parse(rucnum.Chars(i))
+            temporal *= pivote
+            If temporal >= 10 Then
+                Dim suma As Integer = 0
+                For b As Integer = 0 To temporal.ToString.Count - 1 Step +1
+                    suma += Integer.Parse(temporal.ToString.Chars(b))
+                Next
+                pivote -= 1
+                cantidadTotal += suma
+            Else
+                pivote -= 1
+                cantidadTotal += temporal
+            End If
+
+        Next
+        If (cantidadTotal Mod 10) = 0 Then
+            cantidadTotal = 0
+        Else
+            cantidadTotal = 10 - (cantidadTotal Mod 10)
+        End If
+        If cantidadTotal.ToString = rucnum.Chars(9) Then
+            If cedula = False Then
+                If rucnum.EndsWith("001") = False Then
+                    'application.SetStatusBarMessage("El numero de RUC no es válido en Principal o Sucursal ", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+                    Return bandera = False
+                End If
+
+            Else
+                'application.SetStatusBarMessage("RUC válido", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            End If
+        Else
+            'application.SetStatusBarMessage("El dígito verificador es incorrecto ", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            Return bandera = False
+        End If
+        Return bandera = True
+    End Function
+    Private Function digitoVerificador(rucnum As String, application As SAPbouiCOM.Application, cedula As Boolean) As Boolean
+        Dim bandera As Boolean = True
+        Dim provincia = rucnum.Chars(0) & rucnum.Chars(1)
+        If provincia >= 0 Then
+            If provincia <= 22 Then
+            Else
+                'SBO_Application.SetStatusBarMessage("Error provincia no válida", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+                Return bandera = False
+            End If
+        Else
+            'SBO_Application.SetStatusBarMessage("Error provincia no válida", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            Return bandera = False
+        End If
+        If rucnum.Chars(2) <> "9" Then
+            'application.SetStatusBarMessage("Error en el 3er Digito debe ser 9", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            Return bandera = False
+        End If
+        Dim pivote As Integer = 2
+        Dim cantidadTotal As Integer = 0
+        For i As Integer = 8 To 0 Step -1
+            If pivote = 8 Then
+                pivote = 2
+            End If
+            Dim temporal = Integer.Parse(rucnum.Chars(i))
+            temporal *= pivote
+            pivote += 1
+            cantidadTotal += temporal
+        Next
+        If (cantidadTotal Mod 11) = 0 Then
+            cantidadTotal = 0
+        Else
+            cantidadTotal = 11 - (cantidadTotal Mod 11)
+        End If
+        If cantidadTotal.ToString = rucnum.Chars(9) Then
+
+            If rucnum.EndsWith("001") = False Then
+                ' application.SetStatusBarMessage("El numero de RUC no es válido en Principal o Sucursal ", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+                Return bandera = False
+            Else
+                ' application.SetStatusBarMessage("RUC válido", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            End If
+        Else
+            'application.SetStatusBarMessage("El numero de RUC no es válido para el Dígito Verificador ", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+            Return bandera = False
+        End If
+        Return bandera = True
+    End Function
 End Class

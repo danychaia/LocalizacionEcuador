@@ -73,6 +73,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="comprobantes_autorizados.vb" />
     <Compile Include="fact_compro.vb" />
     <Compile Include="inf_tributaria.vb" />
     <Compile Include="localizacion.vb" />
@@ -92,6 +93,11 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="retencion.vb" />
+    <Compile Include="retencion_info.vb" />
+    <Compile Include="retencion_info_detalle.vb" />
+    <Compile Include="retencion_info_ventas.vb" />
+    <Compile Include="retencion_numeros.vb" />
+    <Compile Include="series.vb" />
     <Compile Include="SubMain.vb" />
     <Compile Include="tools\UDT_UF.vb" />
     <Compile Include="tools\validValues.vb" />

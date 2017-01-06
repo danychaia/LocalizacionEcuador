@@ -77,7 +77,7 @@ Public Class retencion
                 If oDe.Value = "" Or oHasta.Value = "" Then
                     SBOApplication.SetStatusBarMessage("Debe de seleccionar un rango de fecha", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
                 Else
-                    generaRetencionXML(oDe.Value, oHasta.Value, SBOApplication)
+                    generaRetencionXML(oDe.Value, oHasta.Value.ToString, SBOApplication)
                 End If
             End If
         End If
@@ -86,8 +86,10 @@ Public Class retencion
     Private Sub generaRetencionXML(p1 As String, p2 As String, app As SAPbouiCOM.Application)
         Dim doc As New XmlDocument
         Dim oRecord As SAPbobsCOM.Recordset
+        Dim oRecordU As SAPbobsCOM.Recordset
         oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
         Dim writer As New XmlTextWriter("Comprobante (RETENCION) No.1.xml", System.Text.Encoding.UTF8)
+        Dim oProgressive As SAPbouiCOM.ProgressBar
 
         writer.WriteStartDocument(True)
         writer.Formatting = Formatting.Indented
@@ -98,8 +100,8 @@ Public Class retencion
             createNode("TipoIDInformante", oRecord.Fields.Item(0).Value.ToString, writer)
             createNode("IdInformante", oRecord.Fields.Item(1).Value.ToString, writer)
             createNode("razonSocial", oRecord.Fields.Item(2).Value.ToString, writer)
-            createNode("Anio", Date.Now.Year, writer)
-            createNode("Mes", Date.Now.Month, writer)
+            createNode("Anio", p1.Substring(0, 4), writer)
+            createNode("Mes", p2.Substring(4, 2), writer)
             createNode("numEstabRuc", oRecord.Fields.Item(3).Value.ToString, writer)
             createNode("totalVentas", "", writer)
             createNode("codigoOperativo", "IVA", writer)
@@ -114,6 +116,7 @@ Public Class retencion
         oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
         oRecord.DoQuery("SP_COMPRA_DETALLE_RETENCION '" & p1 & "','" & p2 & "'")
         If oRecord.RecordCount > 0 Then
+            oProgressive = SBO_Application.StatusBar.CreateProgressBar("Generando Retencion de :", oRecord.RecordCount, True)
             While oRecord.EoF = False
                 writer.WriteStartElement("detalleCompras")
                 createNode("codSustento", oRecord.Fields.Item(1).Value, writer)
@@ -128,9 +131,33 @@ Public Class retencion
                 createNode("fechaEmision", oRecord.Fields.Item(5).Value, writer)
                 createNode("autorizacion", oRecord.Fields.Item(9).Value, writer)
 
+                Dim oRecord2 As SAPbobsCOM.Recordset
+                oRecord2 = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                oRecord2.DoQuery("exec SP_RETENCION_SUMATORIAS " & oRecord.Fields.Item(0).Value & ",'parther'")
+                If oRecord2.RecordCount > 0 Then
+                    While oRecord2.EoF = False
+                        createNode("baseNoGraIva", Double.Parse(oRecord2.Fields.Item(0).Value), writer)
+                        createNode("baseImponible", Double.Parse(oRecord2.Fields.Item(1).Value), writer)
+                        createNode("baseImpGrav", Double.Parse(oRecord2.Fields.Item(2).Value), writer)
+                        createNode("baseImpExe", Double.Parse(oRecord2.Fields.Item(3).Value), writer)
+                        oRecord2.MoveNext()
+                    End While
+                End If
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord2)
+                oRecord2 = Nothing
+                GC.Collect()
+
                 writer.WriteEndElement()
+                oRecordU = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                oRecordU.DoQuery("UPDATE OPCH SET U_ESTADO='G' WHERE DocEntry=" & oRecord.Fields.Item(0).Value)
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordU)
+                oRecordU = Nothing
+                GC.Collect()
                 oRecord.MoveNext()
+                oProgressive.Value += 1
             End While
+            oProgressive.Stop()
+            oProgressive = Nothing
         End If
         System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
         oRecord = Nothing
