@@ -11,7 +11,7 @@
         Try
             Me.SBO_Application = UDT_UF.SBOApplication
             Me.oCompany = UDT_UF.Company
-
+            UDT_UF.code = ""
             If UDT_UF.ActivateFormIsOpen(SBO_Application, "fSdt") = False Then
                 LoadFromXML(XmlForm)
                 oForm = SBO_Application.Forms.Item("fSdt")
@@ -19,11 +19,11 @@
                 oForm.Visible = True
                 oForm.PaneLevel = 1
 
-                Dim oEstable As SAPbouiCOM.EditText
-                Dim oPunto As SAPbouiCOM.EditText
-                Dim oDeI As SAPbouiCOM.EditText
-                Dim oHastaI As SAPbouiCOM.EditText
-                Dim oCombo As SAPbouiCOM.ComboBox
+                'Dim oEstable As SAPbouiCOM.EditText
+                'Dim oPunto As SAPbouiCOM.EditText
+                'Dim oDeI As SAPbouiCOM.EditText
+                'Dim oHastaI As SAPbouiCOM.EditText
+                'Dim oCombo As SAPbouiCOM.ComboBox
                 'Dim cmdenviar As SAPbouiCOM.Button
                 'esto es para poder hacer que los textos tengan formato de fecha
                 oForm.DataSources.DataTables.Add("MyDataTable")
@@ -171,7 +171,7 @@
             Dim gridView As SAPbouiCOM.Grid
             gridView = oForm.Items.Item("Item_0").Specific
             gridView.SelectionMode = SAPbouiCOM.BoMatrixSelect.ms_Single
-            Dim sql As String = "EXEC SERIES_PTO_ESTABLE '3','','','','','','','',''"
+            Dim sql As String = "EXEC SERIES_PTO_ESTABLE '3','','','','','','','','',''"
             oForm.DataSources.DataTables.Item(0).ExecuteQuery(sql)
             gridView.DataTable = oForm.DataSources.DataTables.Item("MyDataTable")
             gridView.AutoResizeColumns()

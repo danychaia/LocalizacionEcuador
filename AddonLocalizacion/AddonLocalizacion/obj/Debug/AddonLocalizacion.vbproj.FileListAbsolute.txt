@@ -1,5 +1,5 @@
-C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.exe.config
 C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.exe
+C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.exe.config
 C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.pdb
 C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.xml
 C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\obj\Debug\Interop.SAPbobsCOM.dll
@@ -10,3 +10,15 @@ C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLoca
 C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\obj\Debug\AddonLocalizacion.exe
 C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\obj\Debug\AddonLocalizacion.xml
 C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\obj\Debug\AddonLocalizacion.pdb
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.exe.config
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\obj\Debug\Interop.SAPbobsCOM.dll
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\obj\Debug\Interop.SAPbouiCOM.dll
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\obj\Debug\AddonLocalizacion.vbproj.ResolveComReference.cache
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\obj\Debug\AddonLocalizacion.exe
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\obj\Debug\AddonLocalizacion.xml
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\obj\Debug\AddonLocalizacion.pdb
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.exe
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.pdb
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.xml
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\obj\Debug\AddonLocalizacion.Resources.resources
+C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\obj\Debug\AddonLocalizacion.vbproj.GenerateResource.Cache

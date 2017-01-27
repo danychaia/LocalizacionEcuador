@@ -15,16 +15,20 @@
             Dim estable As SAPbouiCOM.EditText
             Dim ptoEmisor As SAPbouiCOM.EditText
             Dim ofolder As SAPbouiCOM.Folder
+            Dim ocantidad As SAPbouiCOM.EditText
             If UDT_UF.ActivateFormIsOpen(SBO_Application, "frm_inf") = False Then
                 LoadFromXML(XmlForm)
                 oForm = SBO_Application.Forms.Item("frm_inf")
-                oForm.Visible = True               
+                oForm.Visible = True
+                oForm.DataSources.UserDataSources.Add("Date", SAPbouiCOM.BoDataType.dt_SHORT_NUMBER)
                 ruc = oForm.Items.Item("txtruc").Specific
                 ruc.Value = "0".PadRight(13, "0")
                 estable = oForm.Items.Item("Item_10").Specific
                 ptoEmisor = oForm.Items.Item("Item_12").Specific
                 estable.Value = "0".PadRight(3, "0")
                 ptoEmisor.Value = "0".PadRight(3, "0")
+                ocantidad = oForm.Items.Item("Item_3").Specific
+                ocantidad.DataBind.SetBound(True, "", "Date")
                 ofolder = oForm.Items.Item("Item_21").Specific
                 ofolder.Select()
             Else
@@ -83,6 +87,8 @@
                     Dim rucct As SAPbouiCOM.EditText
                     Dim contri As SAPbouiCOM.EditText
                     Dim especial As SAPbouiCOM.EditText
+                    Dim ocantidad As SAPbouiCOM.EditText
+                    Dim oSistema As SAPbouiCOM.ComboBox
 
                     comboA = oForm.Items.Item("cboAmb").Specific
                     comboE = oForm.Items.Item("cboEmi").Specific
@@ -99,6 +105,9 @@
                     rucct = oForm.Items.Item("rucct").Specific
                     contri = oForm.Items.Item("contri").Specific
                     especial = oForm.Items.Item("numcte").Specific
+                    ocantidad = oForm.Items.Item("Item_3").Specific
+                    oSistema = oForm.Items.Item("Item_8").Specific
+
                     If comboA.Value.Equals("") Then
                         Me.SBO_Application.SetStatusBarMessage("Debe de seleccionar un ambiente", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                         BubbleEvent = False
@@ -125,11 +134,15 @@
                         Return
                     Else
                         If estable.Value.ToString.Count <> 3 Then
-                            Me.SBO_Application.SetStatusBarMessage("Establecimiento no valido, 3 digítos permitidos ", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                            Me.SBO_Application.SetStatusBarMessage("Establecimiento no válido, 3 digítos permitidos ", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                             BubbleEvent = False
                             Return
                         End If
-
+                        If estable.Value.ToString = "000" Then
+                            Me.SBO_Application.SetStatusBarMessage("Establecimiento no válido ", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                            BubbleEvent = False
+                            Return
+                        End If
                     End If
                     If ptoEmisor.Value.Equals("") Then
                         Me.SBO_Application.SetStatusBarMessage("Debe de seleccionar un Emisor", SAPbouiCOM.BoMessageTime.bmt_Short, True)
@@ -137,7 +150,12 @@
                         Return
                     Else
                         If ptoEmisor.Value.ToString.Count <> 3 Then
-                            Me.SBO_Application.SetStatusBarMessage("PtoEmisor no valido, 3 digítos permitidos ", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                            Me.SBO_Application.SetStatusBarMessage("Punto de emisión no válido, 3 digítos permitidos ", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                            BubbleEvent = False
+                            Return
+                        End If
+                        If ptoEmisor.Value.ToString = "" Then
+                            Me.SBO_Application.SetStatusBarMessage("Punto de Emision no válido ", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                             BubbleEvent = False
                             Return
                         End If
@@ -308,10 +326,20 @@
                         BubbleEvent = False
                         Return
                     End If
+                    If ocantidad.Value.Trim = "" Then
+                        Me.SBO_Application.SetStatusBarMessage("Debe de ingresar una cantidad de establecimientos", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                        BubbleEvent = False
+                        Return
+                    End If
+                    If oSistema.Value.Trim = "" Then
+                        Me.SBO_Application.SetStatusBarMessage("Debe de seleccionar un tipo de sistema", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                        BubbleEvent = False
+                        Return
+                    End If
 
                     Dim orecord As SAPbobsCOM.Recordset
                     orecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-                    Dim sql As String = "Exec INSERTAR_INFOR_TRIBUTARIA " & comboA.Value & "," & comboE.Value & ",'" & razon.Value & "','" & nombre.Value & "','" & estable.Value & "','" & ptoEmisor.Value & "','" & direccion.Value & "','" & ruc.Value & "','" & ci.Value & "','" & dina.Value & "','" & identi.Value & "','" & rucct.Value & "','" & contri.Value & "','" & especial.Value & "','" & conta.Value & "','" & oCompany.CompanyName & "'"
+                    Dim sql As String = "Exec INSERTAR_INFOR_TRIBUTARIA " & comboA.Value & "," & comboE.Value & ",'" & razon.Value & "','" & nombre.Value & "','" & estable.Value & "','" & ptoEmisor.Value & "','" & direccion.Value & "','" & ruc.Value & "','" & ci.Value & "','" & dina.Value & "','" & identi.Value & "','" & rucct.Value & "','" & contri.Value & "','" & especial.Value & "','" & conta.Value & "','" & oCompany.CompanyName & "','" & ocantidad.Value.Trim & "','" & oSistema.Value.ToString.Trim & "'"
                     orecord.DoQuery(sql)
                     System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
                     orecord = Nothing
@@ -324,6 +352,8 @@
         Catch ex As Exception
             Me.SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Long, True)
         End Try
+
+
     End Sub
 
     Private Sub cargar()
@@ -345,6 +375,9 @@
             Dim rucct As SAPbouiCOM.EditText
             Dim contri As SAPbouiCOM.EditText
             Dim especial As SAPbouiCOM.EditText
+            Dim ocantidad As SAPbouiCOM.EditText
+            Dim oSistema As SAPbouiCOM.ComboBox
+            ocantidad = oForm.Items.Item("Item_3").Specific
             identi = oForm.Items.Item("Item_0").Specific
             conta = oForm.Items.Item("Item_1").Specific
             comboA = oForm.Items.Item("cboAmb").Specific
@@ -360,6 +393,7 @@
             rucct = oForm.Items.Item("rucct").Specific
             contri = oForm.Items.Item("contri").Specific
             especial = oForm.Items.Item("numcte").Specific
+            oSistema = oForm.Items.Item("Item_8").Specific
             orecord.DoQuery("select * from [@INF_TRIBUTARIA]")
             If orecord.RecordCount > 0 Then
                 While orecord.EoF = False
@@ -380,6 +414,8 @@
                     contri.Value = orecord.Fields.Item("U_CLS_CONTRIBU").Value
                     especial.Value = orecord.Fields.Item("U_CLS_CONTRIBU_NUM").Value
                     conta.Select(orecord.Fields.Item("U_CONTA").Value.ToString, SAPbouiCOM.BoSearchKey.psk_ByValue)
+                    ocantidad.Value = orecord.Fields.Item("U_NO_ESTABLE").Value
+                    oSistema.Select(orecord.Fields.Item("U_T_SISTEMA").Value.ToString, SAPbouiCOM.BoSearchKey.psk_ByValue)
                     orecord.MoveNext()
                 End While
             End If

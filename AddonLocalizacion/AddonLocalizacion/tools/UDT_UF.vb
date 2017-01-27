@@ -26,6 +26,7 @@
         Dim err As String = ""
         Dim num As Integer = 0
         Dim row As Integer = -1
+        
         Try
             If fieldExist(oCompany, tableName, namefield) = False Then
                 Dim oUserFieldsMD As SAPbobsCOM.UserFieldsMD
@@ -34,7 +35,7 @@
                 oUserFieldsMD.Name = namefield   '"DOCUMENTO"
                 oUserFieldsMD.Description = Descripcion  '"DOCUMENTO"
                 oUserFieldsMD.Type = type
-                If type = 2 Or type = 0 Then
+                If type = 0 Then
                     oUserFieldsMD.EditSize = size
                 End If
 
@@ -127,7 +128,7 @@
     End Function
 
 
-    Public Function updateUserField(oCompany As SAPbobsCOM.Company, tableName As String, namefield As String, validArray As ArrayList) As Boolean
+    Public Function updateUserField(ByVal oCompany As SAPbobsCOM.Company, tableName As String, namefield As String, validArray As ArrayList) As Boolean
 
         Dim existe As Boolean = False
         Dim record As SAPbobsCOM.Recordset
@@ -153,7 +154,7 @@
                     oUserField.ValidValues.Description = lista.descrip
                     oUserField.ValidValues.Add()
                 Next
-                If oUserField.Update() <> 0 Then
+                If oUserField.Update <> 0 Then
                     oCompany.GetLastError(eler, mensa)
                     SBOApplication.SetStatusBarMessage(mensa, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
                 End If
@@ -166,6 +167,5 @@
         Return existe
     End Function
 
-  
 
 End Module

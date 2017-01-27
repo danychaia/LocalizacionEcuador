@@ -105,7 +105,6 @@ Public Class retencion
             createNode("numEstabRuc", oRecord.Fields.Item(3).Value.ToString, writer)
             createNode("totalVentas", "", writer)
             createNode("codigoOperativo", "IVA", writer)
-
         End If
 
         writer.WriteStartElement("compras")
@@ -114,7 +113,7 @@ Public Class retencion
         GC.Collect()
 
         oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-        oRecord.DoQuery("SP_COMPRA_DETALLE_RETENCION '" & p1 & "','" & p2 & "'")
+        oRecord.DoQuery("SP_COMPRA_DETALLE_RETENCION '14604'")
         If oRecord.RecordCount > 0 Then
             oProgressive = SBO_Application.StatusBar.CreateProgressBar("Generando Retencion de :", oRecord.RecordCount, True)
             While oRecord.EoF = False
@@ -123,13 +122,13 @@ Public Class retencion
                 createNode("tpIdProv", oRecord.Fields.Item(2).Value, writer)
                 createNode("idProv", oRecord.Fields.Item(3).Value, writer)
                 createNode("tipoComprobante", oRecord.Fields.Item(4).Value, writer)
-                createNode("parteRel", "NO", writer)
+                createNode("parteRel", oRecord.Fields.Item(6).Value, writer)
                 createNode("fechaRegistro", oRecord.Fields.Item(5).Value, writer)
-                createNode("establecimiento", oRecord.Fields.Item(6).Value, writer)
-                createNode("puntoEmision", oRecord.Fields.Item(7).Value, writer)
-                createNode("secuencial", oRecord.Fields.Item(8).Value, writer)
+                createNode("establecimiento", oRecord.Fields.Item(7).Value.ToString.Substring(0, 3), writer)
+                createNode("puntoEmision", oRecord.Fields.Item(7).Value.ToString.Substring(3, 3), writer)
+                createNode("secuencial", oRecord.Fields.Item(7).Value.ToString.Substring(6, 7), writer)
                 createNode("fechaEmision", oRecord.Fields.Item(5).Value, writer)
-                createNode("autorizacion", oRecord.Fields.Item(9).Value, writer)
+                createNode("autorizacion", "", writer)
 
                 Dim oRecord2 As SAPbobsCOM.Recordset
                 oRecord2 = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
@@ -140,9 +139,54 @@ Public Class retencion
                         createNode("baseImponible", Double.Parse(oRecord2.Fields.Item(1).Value), writer)
                         createNode("baseImpGrav", Double.Parse(oRecord2.Fields.Item(2).Value), writer)
                         createNode("baseImpExe", Double.Parse(oRecord2.Fields.Item(3).Value), writer)
+                        createNode("baseImpExe", Double.Parse(oRecord2.Fields.Item(3).Value), writer)
+                        createNode("montoIva", Double.Parse(oRecord2.Fields.Item(4).Value), writer)
+                        createNode("montoIce", Double.Parse(oRecord2.Fields.Item(5).Value), writer)
+                        createNode("valRetBien10", "0.00", writer)
+                        createNode("valRetServ20", "0.00", writer)
+                        createNode("valorRetBienes", "0.00", writer)
+                        createNode("valRetServ50", "0.00", writer)
+                        createNode("valorRetServicios", "0.00", writer)
+                        createNode("valRetServ100", "0.00", writer)
+                        createNode("totbasesImpReemb", "0.00", writer)                      
                         oRecord2.MoveNext()
                     End While
                 End If
+                writer.WriteStartElement("pagoExterior")
+                createNode("pagoLocExt", oRecord.Fields.Item(8).Value, writer)
+                createNode("paisEfecPago", "NA", writer)
+                createNode("aplicConvDobTrib", "NA", writer)
+                createNode("pagExtSujRetNorLeg", "NA", writer)
+                writer.WriteEndElement()
+
+
+
+
+
+                Dim oRecord3 As SAPbobsCOM.Recordset
+                oRecord3 = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                oRecord3.DoQuery("exec SP_COMPRA_DETALLE_RETENCION_AIR '" & oRecord.Fields.Item(0).Value & "'")
+                If oRecord3.RecordCount > 0 Then
+                    While oRecord3.EoF = False
+                        writer.WriteStartElement("detalleAir")
+                        createNode("codRetAir", oRecord3.Fields.Item(0).Value, writer)
+                        createNode("baseImpAir", oRecord3.Fields.Item(1).Value, writer)
+                        createNode("porcentajeAir", oRecord3.Fields.Item(2).Value, writer)
+                        createNode("valRetAir", oRecord3.Fields.Item(3).Value, writer)
+                        writer.WriteEndElement()
+                        oRecord3.MoveNext()
+                    End While
+                End If
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord3)
+                oRecord3 = Nothing
+                GC.Collect()
+
+                createNode("estabRetencion1", oRecord.Fields.Item(10).Value.ToString.Substring(0, 3), writer)
+                createNode("ptoEmiRetencion1", oRecord.Fields.Item(10).Value.ToString.Substring(3, 3), writer)
+                createNode("secRetencion1", oRecord.Fields.Item(10).Value.ToString.Substring(6, 7), writer)
+                createNode("autRetencion1", oRecord.Fields.Item(11).Value, writer)
+                createNode("fechaEmiRet1", oRecord.Fields.Item(5).Value, writer)
+
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord2)
                 oRecord2 = Nothing
                 GC.Collect()

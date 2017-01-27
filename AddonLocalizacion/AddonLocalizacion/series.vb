@@ -112,18 +112,6 @@
                                     SBO_Application.SetStatusBarMessage("Para Facturas Impresas debe de Ingresar un rango, además de un numero de autorización y fecha de caducidad", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
                                     BubbleEvent = False
                                     Return
-                                Else
-                                    'If Date.Parse(oCaducidad.Value) < Date.Now.ToString("yyymmdd") Then
-                                    ''SBO_Application.SetStatusBarMessage("Fecha de caducidad no puede ser menor a la fecha actual", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
-                                    ' BubbleEvent = False
-                                    ' Return
-                                    '  Else
-                                    If oDeI.Value > oHastaI.Value Then
-                                        SBO_Application.SetStatusBarMessage("El valor de inicio no puede ser mayor al del final", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
-                                        BubbleEvent = False
-                                        Return
-                                        ' End If
-                                End If
                             End If
                             If oNoAutori.Value.Count <> 10 Then
                                 SBO_Application.SetStatusBarMessage("No. de Autorización permite 10 digitos", SAPbouiCOM.BoMessageTime.bmt_Medium, True)

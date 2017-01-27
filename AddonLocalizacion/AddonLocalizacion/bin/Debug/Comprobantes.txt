@@ -1,0 +1,31 @@
+Comprobantes	OPCH	TI_COMPRO		
+1	Factura	TI_COMPRO	value
+2	Nota o boleta de venta	TI_COMPRO	value
+3	Liquidación de compra	TI_COMPRO	value
+5	Nota de débito	TI_COMPRO	value
+8	Boletos o entragas es espectaculos públicos	TI_COMPRO	value
+9	Tiket o vales emitidos por maquinas registradoras	TI_COMPRO	value
+11	Pasajes expedidos por empresas de aviación	TI_COMPRO	value
+12	Dtos emitidos por instituciones financieras	TI_COMPRO	value
+15	Comprobante de venta emitido en el Exterior	TI_COMPRO	value
+16	Formulario Único de Exportación (FUE) o Declaración Aduanera Única (DAU) o Declaración Andina de Valor (DAV)	TI_COMPRO	value
+19	Comprobantes de Pago de Cuotas o Aportes	TI_COMPRO	value
+20	Documentos por Servicios Administrativos emitidos por Inst. del Estado	TI_COMPRO	value
+21	Carta de Porte Aéreo	TI_COMPRO	value
+22	RECAP	TI_COMPRO	value
+23	Nota de Crédito TC	TI_COMPRO	value
+24	Nota de Débito TC	TI_COMPRO	value
+41	Comprobante de venta emitido por reembolso	TI_COMPRO	value
+42	Documento agente de retención Presuntiva	TI_COMPRO	value
+43	Liquidacion para Explotacion y Exploracion de Hidrocarburos	TI_COMPRO	value
+44	Comprobante de Contribuciones y Aportes	TI_COMPRO	value
+45	Liquidación por reclamos de aseguradoras	TI_COMPRO	value
+47	Nota de Crédito por Reembolso Emitida por Intermediario	TI_COMPRO	value
+48	Nota de Débito por Reembolso Emitida por Intermediario	TI_COMPRO	value
+49	Proveedor Directo de Exportador Bajo Régimen Especial	TI_COMPRO	value
+50	A Inst. Estado y Empr. Públicas que percibe ingreso exento de Imp. Renta	TI_COMPRO	value
+51	N/C A Inst. Estado y Empr. Públicas que percibe ingreso exento de Imp. Renta	TI_COMPRO	value
+52	N/D A Inst. Estado y Empr. Públicas que percibe ingreso exento de Imp. Renta	TI_COMPRO	value
+99	No Procesar para Anexo Transaccional	TI_COMPRO	value
+294	Liquidación de Compra de Bienes Muebles Usados	TI_COMPRO	value
+4	Nota de crédito	TI_COMPRO	fin

@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<factura id="comprobante" version="2.0.0">
+  <infoTributaria>
+    <ambiente>1</ambiente>
+    <tipoEmision>1</tipoEmision>
+    <razonSocial>PRUEBA</razonSocial>
+    <ruc>1790598616001</ruc>
+    <claveAcesso />
+    <codDoc>01</codDoc>
+    <estab>001</estab>
+    <ptoEmi>002</ptoEmi>
+    <secuencial>000000268</secuencial>
+    <dirMatriz>ECUADOR</dirMatriz>
+  </infoTributaria>
+  <infoFactura>
+    <fechaEmision>20/01/2017</fechaEmision>
+    <tipoIdentificacionComprador>05</tipoIdentificacionComprador>
+    <razonSocialComprador>MARIO</razonSocialComprador>
+    <identificacionComprador>1102871405</identificacionComprador>
+    <totalSinImpuestos>880000</totalSinImpuestos>
+    <totalDescuento>0</totalDescuento>
+    <totalConImpuestos>
+      <totalImpuesto>
+        <codigo>2</codigo>
+        <codigoPorcentaje>19</codigoPorcentaje>
+        <baseImponible>880000</baseImponible>
+        <valor>880000</valor>
+        <baseNoGraIva>0</baseNoGraIva>
+        <baseImponible />
+      </totalImpuesto>
+    </totalConImpuestos>
+    <importeTotal>1047200</importeTotal>
+  </infoFactura>
+  <detalles>
+    <detalle>
+      <descripcion>A00002-IBM Infoprint 1222</descripcion>
+      <cantidad>8</cantidad>
+      <precioUnitario>110000</precioUnitario>
+      <descuento>0</descuento>
+      <precioTotalSinImpuesto>880000</precioTotalSinImpuesto>
+      <impuestos>
+        <impuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>19</codigoPorcentaje>
+          <tarifa>19</tarifa>
+          <baseImponible>880000</baseImponible>
+          <valor>880000</valor>
+        </impuesto>
+      </impuestos>
+    </detalle>
+  </detalles>
+</factura>

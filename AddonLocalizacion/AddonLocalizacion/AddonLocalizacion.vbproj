@@ -99,6 +99,7 @@
     <Compile Include="retencion_numeros.vb" />
     <Compile Include="series.vb" />
     <Compile Include="SubMain.vb" />
+    <Compile Include="tools\generarRetencionXML.vb" />
     <Compile Include="tools\UDT_UF.vb" />
     <Compile Include="tools\validValues.vb" />
     <Compile Include="tools\withHolding.vb" />
