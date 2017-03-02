@@ -10,8 +10,11 @@
     End Property
 
     Private _Company As SAPbobsCOM.Company
+
     Public docEntry As String
     Public code As String = ""
+    Public Totalbase As Double = 0
+    Public TotalRetencion As Double = 0
 
     Public Property Company() As SAPbobsCOM.Company
         Get
@@ -35,6 +38,9 @@
                 oUserFieldsMD.Name = namefield   '"DOCUMENTO"
                 oUserFieldsMD.Description = Descripcion  '"DOCUMENTO"
                 oUserFieldsMD.Type = type
+                If type = 4 Then
+                    oUserFieldsMD.SubType = SAPbobsCOM.BoFldSubTypes.st_Price
+                End If
                 If type = 0 Then
                     oUserFieldsMD.EditSize = size
                 End If
@@ -72,20 +78,15 @@
                 oUserTablesMD = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oUserTables)
                 Dim tabla = "@" & tableName
                 If (oUserTablesMD.GetByKey(tabla) = False) Then
-
                     oUserTablesMD.TableName = tableName
                     oUserTablesMD.TableDescription = Descripcion
                     oUserTablesMD.TableType = type
                     oUserTablesMD.Add()
-
                     oUserTablesMD.Update()
-
                     System.Runtime.InteropServices.Marshal.ReleaseComObject(oUserTablesMD)
                     oUserTablesMD = Nothing
                     GC.Collect()
                 End If
-
-
             Catch ex As Exception
                 Throw New Exception(ex.Message)
             End Try
@@ -161,11 +162,83 @@
             End If
 
         End If
-
-
-
         Return existe
     End Function
 
+    Public Sub AddUDOForm(ByVal Company As SAPbobsCOM.Company, ByVal Code As String, ByVal Name As String, ByVal TableName As String, ByVal UDOType As SAPbobsCOM.BoUDOObjType, Optional ByVal ChildTables As List(Of String) = Nothing, Optional ByVal ListFindColumns As List(Of String) = Nothing, Optional ByVal CanCancel As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanClose As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanDelete As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanFind As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanYearTransfer As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES)
+        Dim oUserObjectMD As SAPbobsCOM.UserObjectsMD
 
+        Try
+
+            Dim sErrMsg As String = ""
+            Dim lErrCode As Integer
+            Dim lRetCode As Integer
+
+            oUserObjectMD = Company.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oUserObjectsMD)
+
+            oUserObjectMD.CanCancel = CanCancel
+            oUserObjectMD.CanClose = CanClose
+            oUserObjectMD.CanCreateDefaultForm = SAPbobsCOM.BoYesNoEnum.tNO
+            oUserObjectMD.CanDelete = CanDelete
+            oUserObjectMD.CanFind = CanFind
+            'oUserObjectMD.CanYearTransfer = CanYearTransfer
+            'oUserObjectMD.ChildTables.TableName = "@ACTF_UBICACIONES"
+            oUserObjectMD.Code = Code
+            'oUserObjectMD.ManageSeries = SAPbobsCOM.BoYesNoEnum.tYES
+            oUserObjectMD.Name = Name
+            oUserObjectMD.ObjectType = UDOType
+            oUserObjectMD.TableName = TableName
+
+            If ListFindColumns IsNot Nothing Then
+                For row = 0 To ListFindColumns.Count - 1
+                    oUserObjectMD.FindColumns.ColumnAlias = ListFindColumns(row).ToString
+                    oUserObjectMD.FindColumns.Add()
+                Next
+            End If
+
+            If Not ChildTables Is Nothing Then
+                For i = 0 To ChildTables.Count - 1
+                    oUserObjectMD.ChildTables.TableName = ChildTables(i).ToString
+                    oUserObjectMD.ChildTables.Add()
+                Next
+            End If
+            '            oUserObjectMD.FindColumns = FindCols
+            lRetCode = oUserObjectMD.Add()
+
+            '// check for errors in the process
+            If lRetCode <> 0 Then
+                Company.GetLastError(lRetCode, sErrMsg)
+                If lRetCode.ToString <> "-2035" And lRetCode.ToString <> "-5002" Then
+                    Throw New Exception(sErrMsg)
+                End If
+            End If
+
+        Catch ex As Exception
+            Throw New Exception(ex.Message)
+        Finally
+            If oUserObjectMD IsNot Nothing Then
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(oUserObjectMD)
+                oUserObjectMD = Nothing
+                GC.Collect()
+                GC.WaitForPendingFinalizers()
+            End If
+        End Try
+    End Sub
+
+    Public Sub FilterCFL(ByVal oForm As SAPbouiCOM.Form, ByVal idCFL As String, ByVal vAlias As String, ByVal ConditionVal As String)
+        Dim oCons As SAPbouiCOM.Conditions
+        Dim oCon As SAPbouiCOM.Condition
+        Dim oCFL As SAPbouiCOM.ChooseFromList = oForm.ChooseFromLists.Item(idCFL)
+
+        Try
+            oCons = oCFL.GetConditions()
+            oCon = oCons.Add()
+            oCon.Alias = vAlias
+            oCon.Operation = SAPbouiCOM.BoConditionOperation.co_EQUAL
+            oCon.CondVal = ConditionVal
+            oCFL.SetConditions(oCons)
+        Catch ex As Exception
+            Throw New Exception(ex.Message)
+        End Try
+    End Sub
 End Module

@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<comprobanteRetencion id="comprobante" version="1.0.0">
+  <infoTributaria>
+    <razonSocial>CONELSA CONDUCTORES ELECTRICOS SA</razonSocial>
+    <ruc>1790015785001</ruc>
+    <codDoc>07</codDoc>
+    <estab>001</estab>
+    <ptoEmi>001</ptoEmi>
+    <secuencial>000000007</secuencial>
+    <dirMatriz>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirMatriz>
+  </infoTributaria>
+  <infoCompRetencion>
+    <fechaEmision>30/12/1899</fechaEmision>
+    <dirEstablecimiento />
+    <contribuyenteEspecial />
+    <obligadoContabilidad />
+    <tipoIdentificacionSujetoRetenido />
+    <razonSocialSujetoRetenido />
+    <identificacionSujetoRetenido />
+    <periodoFiscal>12/1899</periodoFiscal>
+  </infoCompRetencion>
+</comprobanteRetencion>

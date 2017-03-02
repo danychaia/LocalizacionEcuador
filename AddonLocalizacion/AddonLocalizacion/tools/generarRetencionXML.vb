@@ -169,4 +169,68 @@ Public Class generarRetencionXML
         End Try
     End Sub
 
+    Public Sub generaXML(DocEntry As String, objectType As String, oCompany As SAPbobsCOM.Company, SBO As SAPbouiCOM.Application)
+        Try
+            Dim doc As New XmlDocument
+            Dim oRecord As SAPbobsCOM.Recordset
+            oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+            oRecord.DoQuery("exec ENCABEZADO_FACTURA '" & DocEntry & "','RTNC'")
+            Dim writer As New XmlTextWriter("Comprobante (RC) No." & DocEntry.ToString & ".xml", System.Text.Encoding.UTF8)
+            writer.WriteStartDocument(True)
+            writer.Formatting = Formatting.Indented
+            writer.Indentation = 2
+            writer.WriteStartElement("comprobanteRetencion")
+            writer.WriteAttributeString("id", "comprobante")
+            writer.WriteAttributeString("version", "1.0.0")
+            writer.WriteStartElement("infoTributaria")
+            createNode("razonSocial", oRecord.Fields.Item(2).Value.ToString, writer)
+            'createNode("ambiente", oRecord.Fields.Item(0).Value.ToString, writer)
+            'createNode("tipoEmision", oRecord.Fields.Item(1).Value.ToString, writer)
+            createNode("ruc", oRecord.Fields.Item(3).Value.ToString.PadLeft(13, "0"), writer)
+            'createNode("claveAcesso", claveAcceso(oRecord).PadLeft(49, "0"), writer)
+            'createNode("claveAcesso", "", writer)
+            createNode("codDoc", oRecord.Fields.Item("codDoc").Value.ToString.PadLeft(2, "0"), writer)
+            createNode("estab", oRecord.Fields.Item("estable").Value.ToString.PadLeft(3, "0"), writer)
+            createNode("ptoEmi", oRecord.Fields.Item("ptoemi").Value.ToString.PadLeft(3, "0"), writer)
+            createNode("secuencial", oRecord.Fields.Item("secuencial").Value.ToString.PadLeft(9, "0"), writer)
+            createNode("dirMatriz", oRecord.Fields.Item("dirMatriz").Value.ToString, writer)
+            Dim direccion = oRecord.Fields.Item("dirMatriz").Value.ToString
+            ''Cierre info Tributaria
+            writer.WriteEndElement()
+
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
+            oRecord = Nothing
+            GC.Collect()
+
+
+
+            writer.WriteStartElement("infoCompRetencion")
+            oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+            oRecord.DoQuery("exec SP_INFO_FACTURA '" & DocEntry & "','RTNC'")
+            createNode("fechaEmision", Date.Parse(oRecord.Fields.Item("DocDate").Value.ToString).ToString("dd/MM/yyyy"), writer)
+            createNode("dirEstablecimiento", oRecord.Fields.Item(1).Value, writer)
+            createNode("contribuyenteEspecial", oRecord.Fields.Item(2).Value, writer)
+            createNode("obligadoContabilidad", oRecord.Fields.Item(3).Value, writer)
+            createNode("tipoIdentificacionSujetoRetenido", oRecord.Fields.Item("U_IDENTIFICACION").Value.ToString, writer)
+            createNode("razonSocialSujetoRetenido", oRecord.Fields.Item("CardName").Value.ToString, writer)
+            createNode("identificacionSujetoRetenido", oRecord.Fields.Item("U_DOCUMENTO").Value.ToString, writer)
+            createNode("periodoFiscal", oRecord.Fields.Item("YEAR").Value.ToString() & "/" & oRecord.Fields.Item("MONTH").Value.ToString(), writer)
+            ''Cierre infoCompRetencion
+            writer.WriteEndElement()
+                      
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
+            oRecord = Nothing
+            GC.Collect()
+
+
+
+            ''Cierre ComprobanteRetencion
+            writer.WriteEndElement()
+            writer.WriteEndDocument()
+            writer.Close()
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+    End Sub
+
 End Class

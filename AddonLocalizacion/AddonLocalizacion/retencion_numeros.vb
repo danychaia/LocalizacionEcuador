@@ -139,7 +139,7 @@
                             'Dim obutton As SAPbouiCOM.Button
                             ' obutton = oForm.Items.Item("Item_5").Specific
                             'obutton.Caption = "Eliminar"
-                            Dim oCompuesto = estable & punto & correlativo.ToString.PadLeft(7, "0")
+                            Dim oCompuesto = estable & punto & correlativo.ToString.PadLeft(9, "0")
                             UDT_UF.code = oCompuesto & "-" & code
                             oForm.Close()
                             'Dim detalle As New retencion_info_detalle

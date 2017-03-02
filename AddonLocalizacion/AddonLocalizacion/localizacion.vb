@@ -171,7 +171,7 @@ Public Class localizacion
 
             SBO_Application.SetStatusBarMessage("DI Connected To: " & oCompany.CompanyName & vbNewLine & "Add-on is loaded", SAPbouiCOM.BoMessageTime.bmt_Short, False)
             SetNewItems()
-
+            SetFomsUDO()
             'SetNewTax("01", "512 0% a 22 % pago al exterior", SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, 100, "512", "1-1-010-10-000")
             'SetNewTax("02", "513 0% a 22 % pago al exterior", SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, 100, "513", "1-1-010-10-000")
             'SetNewTax("03", "513A 0% a 22 % pago al exterior", SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, 100, "513A", "_SYS00000000128")
@@ -179,7 +179,10 @@ Public Class localizacion
 
             UDT_UF.SBOApplication = Me.SBO_Application
             UDT_UF.Company = Me.oCompany
+            'Dim xmlRetencion As New generarRetencionXML
+            'xmlRetencion.generaXML(283, "RTNC", oCompany, SBOApplication)
             cargarInicial(oCompany, SBO_Application)
+            SBOApplication.StatusBar.SetText("AddOn de LOCALIZACIÓN iniciado...", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success)
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -231,14 +234,23 @@ Public Class localizacion
 
             oMenuItem = SBO_Application.Menus.Item("localización")
             oMenus = oMenuItem.SubMenus
-
-
             oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING
             oCreationPackage.UniqueID = "infTri"
             oCreationPackage.String = "Información Tributaria"
             oMenus.AddEx(oCreationPackage)
 
+            oMenus = oMenuItem.SubMenus
+            oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING
+            oCreationPackage.UniqueID = "infCl"
+            oCreationPackage.String = "Cliente Retenciones"
+            oMenus.AddEx(oCreationPackage)
 
+            oMenus = oMenuItem.SubMenus
+            oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING
+            oCreationPackage.UniqueID = "pCli"
+            oCreationPackage.String = "Pagos Cliente"
+            oMenus.AddEx(oCreationPackage)
+          
             oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_POPUP
             oCreationPackage.UniqueID = "CRtn"
             oCreationPackage.Position = "2"
@@ -258,6 +270,11 @@ Public Class localizacion
             oCreationPackage.String = "Comprobantes Generados"
             oMenus.AddEx(oCreationPackage)
 
+            oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_POPUP
+            oCreationPackage.UniqueID = "gui"
+            oCreationPackage.Position = "5"
+            oCreationPackage.String = "Guía de Remision"
+            oMenus.AddEx(oCreationPackage)
 
             ' MenuItem = SBO_Application.Menus.Item("CRtn")
             'oMenus = oMenuItem.SubMenus
@@ -272,7 +289,17 @@ Public Class localizacion
             oCreationPackage.String = "Comprobante para Retensión"
             oMenus.AddEx(oCreationPackage)
 
+            oMenuItem = SBO_Application.Menus.Item("gui")
+            oMenus = oMenuItem.SubMenus
+            oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING
+            oCreationPackage.UniqueID = "GRe"
+            oCreationPackage.String = "Guía de Remisión"
+            oMenus.AddEx(oCreationPackage)
 
+            oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING
+            oCreationPackage.UniqueID = "tre"
+            oCreationPackage.String = "Tipo de Remision"
+            oMenus.AddEx(oCreationPackage)
 
             oMenuItem = SBO_Application.Menus.Item("inf")
             oMenus = oMenuItem.SubMenus
@@ -325,7 +352,9 @@ Public Class localizacion
         oFilter = oFilters.Add(SAPbouiCOM.BoEventTypes.et_FORM_DATA_DELETE)
         oFilter = oFilters.Add(SAPbouiCOM.BoEventTypes.et_FORM_LOAD)
         oFilter = oFilters.Add(SAPbouiCOM.BoEventTypes.et_MENU_CLICK)
+        oFilter = oFilters.Add(SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST)
         oFilter = oFilters.Add(SAPbouiCOM.BoEventTypes.et_CLICK)
+
         'oFilter = oFilter.Add(SAPbouiCOM.BoEventTypes.et_DOUBLE_CLICK)
         'oFilter = oFilters.Add(SAPbouiCOM.BoEventTypes.et_COMBO_SELECT)
 
@@ -358,6 +387,8 @@ Public Class localizacion
         oFilter.AddEx("-65306")
         oFilter.AddEx("179")
         oFilter.AddEx("-179")
+        oFilter.AddEx("170")
+        oFilter.AddEx("GREMISION_")
         'oFilter.AddEx("139") 'Orders Form
         'oFilter.AddEx("133") 'Invoice Form
         'oFilter.AddEx("169") 'Main Menu
@@ -410,7 +441,7 @@ Public Class localizacion
                         Dim oTipoIden As SAPbouiCOM.ComboBox
                         Dim oTipoCliente As SAPbouiCOM.ComboBox
                         Dim oUform = SBOApplication.Forms.GetForm("-134", pVal.FormTypeCount)
-
+                        
                         oTipoIden = oUform.Items.Item("U_IDENTIFICACION").Specific
                         oBPcode = oform.Items.Item("5").Specific
                         oTipoCliente = oform.Items.Item("40").Specific
@@ -433,15 +464,14 @@ Public Class localizacion
                         End If
 
                         If oTipoIden.Value = "" Then
-                            SBOApplication.SetStatusBarMessage("Debe de seleccionar un tipo de Identificación", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+                            SBOApplication.SetStatusBarMessage("Debe de Elegir un Tipo de Identificación", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
                             System.Media.SystemSounds.Asterisk.Play()
                             BubbleEvent = False
                             Return
                         End If
 
-
-                        ''Cuando se selecciona un RUC
-                        If oTipoIden.Selected.Description = "RUC" And oBPcode.Value <> "" Then
+                        ''Cuando se selecciona un RUC                      
+                        If oTipoIden.Value.Trim = "04" And oBPcode.Value <> "" Then
                             Dim oDocumento As SAPbouiCOM.EditText
                             oDocumento = oUform.Items.Item("U_DOCUMENTO").Specific
                             oDocumento.Value = Trim(Right(oBPcode.Value, Len(oBPcode.Value) - 2)).ToString
@@ -454,24 +484,17 @@ Public Class localizacion
                                     BubbleEvent = False
                                     Return
                                 End Try
-                                Dim oTipoRuc As SAPbouiCOM.ComboBox
-                                oTipoRuc = oUform.Items.Item("U_TIPO_RUC").Specific
-                                If oTipoRuc.Value <> "" Then
-                                    If oTipoRuc.Selected.Description = "PUBLICO" Then
+                             
+                                'MessageBox.Show(oDocumento.ToString.Chars(2))
+                                Dim claserum = Integer.Parse(oDocumento.Value.ToString.Chars(2))
+                                If claserum = 9 Then
+                                    BubbleEvent = digitoVerificador(oDocumento.Value, Me.SBO_Application, True)
+                                Else
+                                    If claserum = 6 Then
                                         BubbleEvent = digitoVerificadorPublico(oDocumento.Value, SBOApplication, True)
                                     Else
-                                        If oTipoRuc.Selected.Description = "NATURAL" Then
-                                            BubbleEvent = digitoVerificadorIndividual(oDocumento.Value, SBOApplication, False)
-                                        Else
-                                            If oTipoRuc.Selected.Description = "EXTRANJERO" Then
-                                                BubbleEvent = digitoVerificador(oDocumento.Value, Me.SBO_Application, True)
-                                            End If
-                                        End If
+                                        BubbleEvent = digitoVerificadorIndividual(oDocumento.Value, SBOApplication, True)
                                     End If
-                                Else
-                                    SBOApplication.SetStatusBarMessage("Debe de seleccionar un tipo de RUC", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
-                                    System.Media.SystemSounds.Asterisk.Play()
-                                    BubbleEvent = False
                                 End If
                             Else
                                 SBOApplication.SetStatusBarMessage("RUC debe contener 13 dígitos", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
@@ -479,7 +502,7 @@ Public Class localizacion
                                 BubbleEvent = False
                             End If
                         Else
-                            If oTipoIden.Selected.Description = "CEDULA" Then
+                            If oTipoIden.Value.Trim = "05" Then
                                 Dim oDocumento As SAPbouiCOM.EditText
                                 oDocumento = oUform.Items.Item("U_DOCUMENTO").Specific
                                 oDocumento.Value = Trim(Right(oBPcode.Value, Len(oBPcode.Value) - 2)).ToString
@@ -497,35 +520,23 @@ Public Class localizacion
                                         BubbleEvent = False
                                         Return
                                     End Try
-                                    Dim oTipoRuc As SAPbouiCOM.ComboBox
-                                    oTipoRuc = oUform.Items.Item("U_TIPO_RUC").Specific
 
-                                    If oTipoRuc.Value <> "" Then
-                                        If oTipoRuc.Selected.Description = "PUBLICO" Then
+                                    Dim claserum = Integer.Parse(oDocumento.Value.ToString.Chars(2))
+                                    If claserum = 9 Then
+                                        BubbleEvent = False
+                                        SBOApplication.SetStatusBarMessage("Cédula no válida.", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+                                        Return
+                                    Else
+                                        If claserum = 6 Then
                                             BubbleEvent = digitoVerificadorPublico(oDocumento.Value, SBOApplication, True)
                                         Else
-                                            If oTipoRuc.Selected.Description = "NATURAL" Then
-                                                BubbleEvent = digitoVerificadorIndividual(oDocumento.Value, SBOApplication, True)
-                                            Else
-
-                                                If oTipoRuc.Selected.Description = "EXTRANJERO" Then
-                                                    SBO_Application.SetStatusBarMessage("Para Cedula no se puede seleccionar un tipo RUC EXTRANJERO", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
-                                                    System.Media.SystemSounds.Asterisk.Play()
-                                                    BubbleEvent = False
-                                                    Return
-                                                End If
-                                            End If
+                                            BubbleEvent = digitoVerificadorIndividual(oDocumento.Value, SBOApplication, True)
                                         End If
-                                    Else
-                                        SBOApplication.SetStatusBarMessage("Debe un Tipo de Cédula", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
-                                        System.Media.SystemSounds.Asterisk.Play()
-                                        BubbleEvent = False
-                                        Return
                                     End If
 
                                 End If
                             Else
-                                If oTipoIden.Selected.Description = "PASAPORTE" Then
+                                If oTipoIden.Value.Trim = "06" Then
                                     Dim oDocumento As SAPbouiCOM.EditText
                                     oDocumento = oUform.Items.Item("U_DOCUMENTO").Specific
                                     If oDocumento.Value = "" Then
@@ -607,18 +618,18 @@ Public Class localizacion
                     End If
                 End If
 
-                If pVal.FormTypeEx = "133" And pVal.Before_Action = True And pVal.ItemUID = "1" Then
-                    If pVal.EventType = SAPbouiCOM.BoEventTypes.et_CLICK Then
-                        Try
-                            Dim oAutoRetencion As SAPbouiCOM.EditText
-                            Dim oUForm = SBOApplication.Forms.GetForm("-133", pVal.FormTypeCount)
-                            oAutoRetencion = oUForm.Items.Item("U_RETENCION_NO").Specific
-                            oAutoRetencion.Value = UDT_UF.code
-                        Catch ex As Exception
-                            SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
-                        End Try
-                    End If
-                End If
+                'If pVal.FormTypeEx = "133" And pVal.Before_Action = True And pVal.ItemUID = "1" Then
+                ' If pVal.EventType = SAPbouiCOM.BoEventTypes.et_CLICK Then
+                'Try
+                'Dim oAutoRetencion As SAPbouiCOM.EditText
+                'Dim oUForm = SBOApplication.Forms.GetForm("-133", pVal.FormTypeCount)
+                ' oAutoRetencion = oUForm.Items.Item("U_RETENCION_NO").Specific
+                'oAutoRetencion.Value = UDT_UF.code
+                ' Catch ex As Exception
+                'SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+                'End Try
+                'End If
+                '  End If
 
 
                 If pVal.FormTypeEx = "181" And pVal.Before_Action = True And pVal.ItemUID = "1" Then
@@ -648,16 +659,7 @@ Public Class localizacion
                 End If
 
                 If pVal.FormTypeEx = "179" And pVal.Before_Action = True And pVal.ItemUID = "1" Then
-                    If pVal.EventType = SAPbouiCOM.BoEventTypes.et_CLICK Then
-                        Try
-                            Dim oAutoRetencion As SAPbouiCOM.EditText
-                            Dim oUForm = SBOApplication.Forms.GetForm("-179", pVal.FormTypeCount)
-                            oAutoRetencion = oUForm.Items.Item("U_RETENCION_NO").Specific
-                            oAutoRetencion.Value = UDT_UF.code
-                        Catch ex As Exception
-                            SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
-                        End Try
-                    End If
+                   
                 End If
                 If pVal.FormTypeEx = "65306" And pVal.Before_Action = True And pVal.ItemUID = "1" Then
                     If pVal.EventType = SAPbouiCOM.BoEventTypes.et_CLICK Then
@@ -670,8 +672,36 @@ Public Class localizacion
                             SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
                         End Try
                     End If
+                    BubbleEvent = False
+                    Return
                 End If
-            End If 
+            End If
+
+            If pVal.FormTypeEx = "170" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_FORM_LOAD And pVal.BeforeAction = False Then
+                Dim oNewItem As SAPbouiCOM.Item
+                Dim NewButton As SAPbouiCOM.Button
+                Dim oitem As SAPbouiCOM.Item
+                Dim ocmdFirma As SAPbouiCOM.Item
+                Dim myForm = SBO_Application.Forms.GetFormByTypeAndCount(pVal.FormType, pVal.FormTypeCount)
+                oitem = myForm.Items.Item("2")
+                oNewItem = myForm.Items.Add("btnPago", SAPbouiCOM.BoFormItemTypes.it_BUTTON)
+                oNewItem.Left = oitem.Left + 80
+                oNewItem.Width = oitem.Width + 30
+                oNewItem.Top = oitem.Top
+                oNewItem.Height = oitem.Height
+                NewButton = oNewItem.Specific
+                NewButton.Caption = "Pago de Retencion"
+                ocmdFirma = myForm.Items.Item("btnPago")
+                ocmdFirma.Enabled = True
+                BubbleEvent = False
+                Return
+            End If
+
+            If pVal.FormTypeEx = "170" And pVal.ItemUID = "btnPago" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED And pVal.BeforeAction = False Then
+                '  Dim opago As New pago_Retencion
+                '   BubbleEvent = False
+                '  Return
+            End If
         Catch ex As Exception
             SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
         End Try
@@ -681,21 +711,27 @@ Public Class localizacion
 
     Private Sub SBO_Application_DATAEVENT(ByRef pVal As SAPbouiCOM.BusinessObjectInfo, ByRef BubbleEvent As Boolean) Handles SBO_Application.FormDataEvent
         Try
-
             If pVal.FormTypeEx = "141" And pVal.BeforeAction = False And pVal.ActionSuccess = True Then
                 UDT_UF.code = ""
                 Dim doc As New XmlDocument
                 doc.LoadXml(pVal.ObjectKey)
                 Dim docEntrynode = doc.DocumentElement.SelectSingleNode("/DocumentParams/DocEntry")
                 Dim xmlRetencion As New generarRetencionXML
-                xmlRetencion.generaRetencionXML(docEntrynode.InnerText, "compra", SBOApplication, oCompany)
+                xmlRetencion.generaXML(docEntrynode.InnerText, "RTNC", oCompany, SBOApplication)
             End If
-            If pVal.FormTypeEx = "133" And pVal.BeforeAction = False And pVal.ActionSuccess = True Then
-                'MessageBox.Show(pVal.ObjectKey)
+            If pVal.FormTypeEx = "133" And pVal.BeforeAction = False And pVal.ActionSuccess = True Then               
                 Dim doc As New XmlDocument
                 doc.LoadXml(pVal.ObjectKey)
                 Dim docEntrynode = doc.DocumentElement.SelectSingleNode("/DocumentParams/DocEntry")
-                generarXML(docEntrynode.InnerText, "13")
+                Dim oFac As New generarFXML
+                oFac.generarXML(docEntrynode.InnerText, "13", oCompany, SBOApplication)
+            End If
+            If pVal.FormTypeEx = "179" And pVal.BeforeAction = False And pVal.ActionSuccess = True Then               
+                Dim doc As New XmlDocument
+                doc.LoadXml(pVal.ObjectKey)
+                Dim docEntrynode = doc.DocumentElement.SelectSingleNode("/DocumentParams/DocEntry")
+                Dim oNC As New generarNCXML
+                oNC.generarXML(docEntrynode.InnerText, "14", oCompany, SBOApplication)
             End If
         Catch ex As Exception
             SBOApplication.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
@@ -708,7 +744,23 @@ Public Class localizacion
         If (pVal.MenuUID = "fact") And (pVal.BeforeAction = False) Then
             Dim fact As New fact_compro
             BubbleEvent = False
+        End If       
+        If (pVal.MenuUID = "pCli") And (pVal.BeforeAction = False) Then
+            Dim pagos_Remision As New pago_retencion_cliente
+            BubbleEvent = False
         End If
+        If (pVal.MenuUID = "GRe") And (pVal.BeforeAction = False) Then
+            Dim Guia As New guia_remision
+            BubbleEvent = False
+        End If
+        If (pVal.MenuUID = "infCl") And (pVal.BeforeAction = False) Then
+            Dim infoCliente As New retencion_cliente
+            BubbleEvent = False
+        End If
+        If (pVal.MenuUID = "tre") And (pVal.BeforeAction = False) Then
+            BubbleEvent = False
+        End If
+
         If (pVal.MenuUID = "infTri") And (pVal.BeforeAction = False) Then
             Dim inf As New inf_tributaria
             BubbleEvent = False
@@ -738,23 +790,34 @@ Public Class localizacion
     Private Sub SetNewItems()
         Try
             UDT_UF.userField(oCompany, "OCRD", "TIPO IDENTIFICACION", 45, "IDENTIFICACION", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBO_Application)
-            UDT_UF.userField(oCompany, "OCRD", "TIPO RUC", 45, "TIPO_RUC", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
+            'UDT_UF.userField(oCompany, "OCRD", "TIPO RUC", 45, "TIPO_RUC", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             UDT_UF.userField(oCompany, "OCRD", "LOCAL O EXTERIOR", 45, "TIPO_CONTRI", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             UDT_UF.userField(oCompany, "OCRD", "NO. DOCUMENTO", 45, "DOCUMENTO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBO_Application)
             ' UDT_UF.userField(oCompany, "OCRD", "RISE", 45, "RISE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OCRD", "TIPO_SUJETO", 45, "TIPO_SUJETO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OCRD", "PAIS PAGO", 45, "PAIS_PAGO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OCRD", "FORMA DE PAGO", 45, "FORMA_PAGO", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
+            UDT_UF.userField(oCompany, "OCRD", "SEXO", 3, "SEXO", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)            
+            UDT_UF.userField(oCompany, "OCRD", "ESTADO CIVIL", 3, "ESTADO_CIVIL", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
+            UDT_UF.userField(oCompany, "OCRD", "ORIGEN DE INGRESOS", 3, "O_INGRESOS", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
+            UDT_UF.userField(oCompany, "OCRD", "CONTRIBUYENTE ESPECIAL", 15, "C_ESPECIAL", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OCRD", "OBLIGADO A LLEVAR CONTA.", 3, "OBLI_CONTA", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
+
             'UDT_UF.userField(oCompany, "OCRD", "TIPO SUJETO", "TIPO_SUJETO", )
             UDT_UF.userTable(oCompany, "INF_TRIBUTARIA", "INFORMACION TRIBUTARIA", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
-            UDT_UF.userTable(oCompany, "INF_PARTNER", "ADICIONAL AL PARTNER", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_MasterData, False, SBOApplication)
+            UDT_UF.userTable(oCompany, "INF_PARTNER", "ADICIONAL AL PARTNER", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObjectAutoIncrement, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INF_PARTNER", "CLIENTE", 15, "CLIENTE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INF_PARTNER", "RAZON", 70, "RAZON", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INF_PARTNER", "BASE", 10, "BASE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INF_PARTNER", "RETENCION", 10, "RETENCION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+
             UDT_UF.userTable(oCompany, "PAIS", "REGISTRO DE PAIS", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
             UDT_UF.userTable(oCompany, "MUNI_CANTO", "CANTON O MUNICIPIO", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
             UDT_UF.userTable(oCompany, "PARROQUIAS", "PARROQUIAS", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
             UDT_UF.userField(oCompany, "@PARROQUIAS", "CANTON", 30, "CANTON", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@PARROQUIAS", "PRIVINCIA", 30, "PROVINCIA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
 
-            UDT_UF.userField(oCompany, "@INF_PARTNER", "DOBLE TRIBU", 30, "DO_TRI", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            'UDT_UF.userField(oCompany, "@INF_PARTNER", "DOBLE TRIBU", 30, "DO_TRI", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@INF_TRIBUTARIA", "AMBIENTE", 11, "AMBIENTE", SAPbobsCOM.BoFieldTypes.db_Numeric, False, SBO_Application)
             UDT_UF.userField(oCompany, "@INF_TRIBUTARIA", "EMISION", 11, "EMISION", SAPbobsCOM.BoFieldTypes.db_Numeric, False, SBO_Application)
             'UDT_UF.userField(oCompany, "@INF_TRIBUTARIA", "EMISION", 11, "EMISION", SAPbobsCOM.BoFieldTypes.db_Numeric, False, SBO_Application)
@@ -780,6 +843,38 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "@COMPRO_AUTO", "TIPO COMPROBANTE", 45, "TIPO_COMPRO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@COMPRO_AUTO", "SUSTENTO TRIBUTARIO", 25, "CODE_SUSTENTO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
 
+
+
+            UDT_UF.userTable(oCompany, "GREMISION", "GUIA DE REMISION", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_MasterData, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "RUC DESTINATARIO", 14, "RUC_DESTI", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "DESTINATARIO", 30, "RUC_DESTI", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "No. DOCUMENTO", 30, "N_DOCUMENTO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "PUNTO DE LLEGADA", 30, "PTO_LLEGADA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "PUNTO DE PARTIDA", 30, "PTO_PARTIDA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "FECHA INICIO TRASLADO", 30, "F_ITRASLADO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "FECHA FIN TRASLADO", 30, "F_FTRASLADO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "GUIA TRASPORTISTA FINAL", 30, "G_TFINAL", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "CONSECUTIVO", 30, "CONSECUTIVO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "RUC TRANSPORTISTA", 30, "G_TRANSPOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "TRANSPORTISTA", 60, "TRANPORTISTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "PLACA", 30, "PLACA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "BIENES TRANSPORTADOS", 30, "B_TRANS", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "FECHA ENVIO", 30, "F_ENVIO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+
+
+            UDT_UF.userTable(oCompany, "TGUIA", "TIPO GUIA", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_MasterDataLines, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@TGUIA", "DOCUMENTO INICIAL", 14, "DOC_INI", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@TGUIA", "DOCUMENTO FINAL", 14, "DOC_FI", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@TGUIA", "NO. EMPAQUE", 14, "N_EMPAQUE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+
+            UDT_UF.userTable(oCompany, "P_RETENCION", "PAGO RETENCION", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObjectAutoIncrement, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@P_RETENCION", "RUC CLIENTE", 20, "CLIENTE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@P_RETENCION", "NO DOCUMENTO", 20, "N_DOCUMENTO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@P_RETENCION", "BASE", 20, "BASE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@P_RETENCION", "RETENCION", 20, "RETENCION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@P_RETENCION", "TOTAL BASE", 20, "T_BASE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@P_RETENCION", "RETENCION", 20, "T_RETENCION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+
             UDT_UF.userTable(oCompany, "SERIES", "INFORMACION AUTORIZACIONES", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
             UDT_UF.userField(oCompany, "@SERIES", "CODIGO ESTABLECIMIENTO", 3, "E_CODE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@SERIES", "CODIGO PUNTO EMISION", 3, "P_CODE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
@@ -794,6 +889,7 @@ Public Class localizacion
 
             UDT_UF.userField(oCompany, "OINV", "ESTADO", 3, "ESTADO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OINV", "NO. AUTORIZACION", 60, "NO_AUTORI", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OINV", "FORMA DE PAGO", 60, "FORMA_PAGO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
 
             UDT_UF.userField(oCompany, "OWHT", "CODIGO ATS", 45, "COD_ATS", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
 
@@ -803,13 +899,24 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "OPCH", "SUJETO A RETENCION", 25, "SUJE_RETENCION", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "PARTE RELACIONADA", 25, "PT_RELACIO", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "No. RETENCION", 45, "RETENCION_NO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "PCH1", "MONTO ICE ", 11, "MONTO_ICE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "PCH1", "ID PROVEEDOR ", 13, "ID_PROVEEDOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "PCH1", "ID PROVEEDOR ", 13, "ID_PROVEEDOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+
+            'CAMPOS PARA FACTURA DE REEEMBOLSO
+            UDT_UF.userField(oCompany, "PCH1", "ID PROVEEDOR REEMBOLSO ", 13, "ID_PROVEEDOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "NOMBRE PROVEEDOR REEMBOLSO ", 60, "N_PROVEEDOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "BASE 12", 6, "BASE_12", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "BASE 0", 6, "BASE_0", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "NO OBJETO DE IVA ", 6, "IVA_NOBJETOREEM", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "BASE EXCENTA REEMBOLSO", 6, "B_EXENTA_REEM", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "BASE EXCENTA REEMBOLSO", 6, "B_EXENTA_REEM", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "GUIA PROVEEDOR", 11, "GUIA_PROVEEDOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "PCH1", "MONTO IVA ", 11, "MONTO_IVA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "PCH1", "AUTORIZACION REEMBOLSO ", 11, "AUTO_REEMBOLSO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "PCH1", "MONTO ICE ", 11, "MONTO_ICE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "ORPC", "No. RETENCION", 45, "RETENCION_NO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "TIPO DE COMPROBANTE", 11, "T_COMPROBANTE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "SERIE ESTABLECIMIENTO", 4, "SE_ESTABLE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "PUNTO DE EMISION ", 11, "PTO_EMISION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "FECHA EMISON", 11, "FE_EMISION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "MONTO ICE ", 11, "MONTO_ICE", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+
             'UDT_UF.userField(oCompany, "OPCH", "SECUENCIAL", 3, "PTO_EMISION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             ''  updateValidValues()
         Catch ex As Exception
@@ -820,7 +927,6 @@ Public Class localizacion
 
     Private Sub SetNewTax(wtCode As String, wtName As String, category As SAPbobsCOM.WithholdingTaxCodeCategoryEnum, baseType As SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum, baseAmount As Double, oficialCode As String, taxAccount As String, ATSCode As String, rate As Double)
         Try
-
             Dim erroS As String = " "
             Dim erro2 As Integer = 0
             Dim oTax As SAPbobsCOM.WithholdingTaxCodes
@@ -844,8 +950,6 @@ Public Class localizacion
                     MessageBox.Show(erro2 & erroS)
                 End If
             End If
-
-
         Catch ex As Exception
             SBOApplication.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, False)
         End Try
@@ -1086,6 +1190,21 @@ Public Class localizacion
                     End If
                 End While
             End Using
+            validArrayList.Clear()
+            Using fileReader As New FileIO.TextFieldParser(Application.StartupPath & "\Formas_Pago.txt")
+                fileReader.TextFieldType = FileIO.FieldType.Delimited
+                fileReader.SetDelimiters(vbTab)
+                While Not fileReader.EndOfData
+                    Dim currentLine As String() = fileReader.ReadFields()
+                    Dim oValidV As New validValues
+                    oValidV.value = currentLine(1).ToString
+                    oValidV.descrip = currentLine(0).ToString
+                    validArrayList.Add(oValidV)
+                End While
+                UDT_UF.updateUserField(oCompany, "OCRD", "FORMA_PAGO", validArrayList)
+                UDT_UF.updateUserField(oCompany, "OINV", "FORMA_PAGO", validArrayList)
+                validArrayList.Clear()
+            End Using
 
 
             Dim validArray As New ArrayList()
@@ -1163,6 +1282,20 @@ Public Class localizacion
             validArray.Clear()
             oValid = Nothing
             oValid = New validValues
+            oValid.value = "SI"
+            oValid.descrip = "SI"
+            validArray.Add(oValid)
+
+            oValid = Nothing
+            oValid = New validValues
+            oValid.value = "NO"
+            oValid.descrip = "NO"
+            validArray.Add(oValid)
+            UDT_UF.updateUserField(oCompany, "OCRD", "OBLI_CONTA", validArray)
+
+            validArray.Clear()
+            oValid = Nothing
+            oValid = New validValues
             oValid.value = "01"
             oValid.descrip = "SI"
             validArray.Add(oValid)
@@ -1176,49 +1309,7 @@ Public Class localizacion
             UDT_UF.updateUserField(oCompany, "OPCH", "PT_RELACIO", validArray)
             validArray.Clear()
 
-            oValid = Nothing
-            oValid = New validValues
-
-            oValid.value = "01"
-            oValid.descrip = "SIN UTILIZACION DEL SISTEMA FINANCIERO"
-            validArray.Add(oValid)
-
-            oValid = Nothing
-            oValid = New validValues
-
-            oValid.value = "02"
-            oValid.descrip = "CHEQUE PROPIO"
-            validArray.Add(oValid)
-
-            oValid = Nothing
-            oValid = New validValues
-
-            oValid.value = "03"
-            oValid.descrip = "CHEQUE CERTIFICADO"
-            validArray.Add(oValid)
-            oValid = Nothing
-            oValid = New validValues
-            oValid.value = "04"
-            oValid.descrip = "CHEQUE DE GERENCIA"
-            validArray.Add(oValid)
-
-            oValid = Nothing
-            oValid = New validValues
-
-            oValid.value = "05"
-            oValid.descrip = "CHEQUE DEL EXTERIOR"
-            validArray.Add(oValid)
-
-            oValid = Nothing
-            oValid = New validValues
-            oValid.value = "06"
-            oValid.descrip = "DÉBITO DE CUENTA"
-            validArray.Add(oValid)
-
-            UDT_UF.updateUserField(oCompany, "OCRD", "FORMA_PAGO", validArray)
-            validArray.Clear()
-
-
+         
             oValid = Nothing
             oValid = New validValues
             oValid.value = "01"
@@ -1229,15 +1320,11 @@ Public Class localizacion
             oValid.value = "02"
             oValid.descrip = "NO"
             validArray.Add(oValid)
-
             UDT_UF.updateUserField(oCompany, "OPCH", "SUJE_RETENCION", validArray)
             validArray.Clear()
-
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
-
-
     End Sub
 
 
@@ -1262,7 +1349,7 @@ Public Class localizacion
         Dim oRecord As SAPbobsCOM.Recordset
         oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
 
-        oRecord.DoQuery("exec ENCABEZADO_FACTURA '" & DocEntry & "'")
+        oRecord.DoQuery("exec ENCABEZADO_FACTURA '" & DocEntry & "','13'")
         Dim writer As New XmlTextWriter("Comprobante (F) No." & DocEntry.ToString & ".xml", System.Text.Encoding.UTF8)
         writer.WriteStartDocument(True)
         writer.Formatting = Formatting.Indented
@@ -1271,17 +1358,18 @@ Public Class localizacion
         writer.WriteAttributeString("id", "comprobante")
         writer.WriteAttributeString("version", "2.0.0")
         writer.WriteStartElement("infoTributaria")
-        createNode("ambiente", oRecord.Fields.Item(0).Value.ToString, writer)
-        createNode("tipoEmision", oRecord.Fields.Item(1).Value.ToString, writer)
         createNode("razonSocial", oRecord.Fields.Item(2).Value.ToString, writer)
+        'createNode("ambiente", oRecord.Fields.Item(0).Value.ToString, writer)
+        'createNode("tipoEmision", oRecord.Fields.Item(1).Value.ToString, writer)
         createNode("ruc", oRecord.Fields.Item(3).Value.ToString.PadLeft(13, "0"), writer)
         'createNode("claveAcesso", claveAcceso(oRecord).PadLeft(49, "0"), writer)
-        createNode("claveAcesso", "", writer)
+        'createNode("claveAcesso", "", writer)
         createNode("codDoc", oRecord.Fields.Item("codDoc").Value.ToString.PadLeft(2, "0"), writer)
         createNode("estab", oRecord.Fields.Item("estable").Value.ToString.PadLeft(3, "0"), writer)
         createNode("ptoEmi", oRecord.Fields.Item("ptoemi").Value.ToString.PadLeft(3, "0"), writer)
         createNode("secuencial", oRecord.Fields.Item("secuencial").Value.ToString.PadLeft(9, "0"), writer)
         createNode("dirMatriz", oRecord.Fields.Item("dirMatriz").Value.ToString, writer)
+        Dim direccion = oRecord.Fields.Item("dirMatriz").Value.ToString
         ''Cierre info Tributaria
         writer.WriteEndElement()
 
@@ -1291,9 +1379,13 @@ Public Class localizacion
 
         writer.WriteStartElement("infoFactura")
         oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-        oRecord.DoQuery("exec SP_INFO_FACTURA '" & DocEntry & "'")
+        oRecord.DoQuery("exec SP_INFO_FACTURA '" & DocEntry & "','13'")
         createNode("fechaEmision", Date.Parse(oRecord.Fields.Item("DATE").Value.ToString).ToString("dd/MM/yyyy"), writer)
+        createNode("dirEstablecimiento", oRecord.Fields.Item(1).Value, writer)
+        createNode("contribuyenteEspecial", oRecord.Fields.Item(2).Value, writer)
+        createNode("obligadoContabilidad", oRecord.Fields.Item(3).Value, writer)
         createNode("tipoIdentificacionComprador", oRecord.Fields.Item("U_IDENTIFICACION").Value.ToString, writer)
+        createNode("guiaRemision", "", writer)
         createNode("razonSocialComprador", oRecord.Fields.Item("CardName").Value.ToString, writer)
         createNode("identificacionComprador", oRecord.Fields.Item("U_DOCUMENTO").Value.ToString, writer)
         createNode("totalSinImpuestos", oRecord.Fields.Item("sin_impuesto").Value.ToString, writer)
@@ -1301,31 +1393,54 @@ Public Class localizacion
 
         writer.WriteStartElement("totalConImpuestos")
         Dim importeTotal = oRecord.Fields.Item("DocTotal").Value.ToString
-
+        Dim moneda = oRecord.Fields.Item("MONEDA").Value.ToString
         System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
         oRecord = Nothing
         GC.Collect()
 
         oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-        oRecord.DoQuery("exec SP_Total_Con_Impuesto '" & DocEntry & "'")
+        oRecord.DoQuery("exec SP_Total_Con_Impuesto '" & DocEntry & "','13'")
         If oRecord.RecordCount > 0 Then
             While oRecord.EoF = False
                 writer.WriteStartElement("totalImpuesto")
                 createNode("codigo", oRecord.Fields.Item(0).Value.ToString, writer)
                 createNode("codigoPorcentaje", oRecord.Fields.Item(1).Value.ToString, writer)
                 createNode("baseImponible", oRecord.Fields.Item(2).Value.ToString, writer)
-                createNode("valor", oRecord.Fields.Item(2).Value.ToString, writer)
-                createNode("baseNoGraIva", Double.Parse("0.00").ToString, writer)
-                createNode("baseImponible", "", writer)
+                createNode("tarifa", oRecord.Fields.Item(3).Value, writer)
+                createNode("valor", oRecord.Fields.Item(4).Value.ToString, writer)
                 writer.WriteEndElement()
                 oRecord.MoveNext()
             End While
         End If
-
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
+        oRecord = Nothing
+        GC.Collect()
 
         ''Cierre TotalConImpuestos
         writer.WriteEndElement()
+        createNode("propina", "0.00", writer)
         createNode("importeTotal", importeTotal, writer)
+        createNode("moneda", moneda, writer)
+
+        writer.WriteStartElement("pagos")
+        oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+        oRecord.DoQuery("exec SP_Forma_Pago '" & DocEntry & "'")
+        If oRecord.RecordCount > 0 Then
+            While oRecord.EoF = False
+                writer.WriteStartElement("pago")
+                createNode("formaPago", oRecord.Fields.Item(0).Value, writer)
+                createNode("total", oRecord.Fields.Item(1).Value, writer)
+                createNode("plazo", oRecord.Fields.Item(2).Value, writer)
+                createNode("unidadTiempo", oRecord.Fields.Item(3).Value, writer)
+                writer.WriteEndElement()
+                oRecord.MoveNext()
+            End While
+        End If
+        ''Cierre Pagos
+        writer.WriteEndElement()
+
+
+
         ''Cierre INFO FACTURA
         writer.WriteEndElement()
         System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
@@ -1334,7 +1449,7 @@ Public Class localizacion
 
         writer.WriteStartElement("detalles")
         oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-        oRecord.DoQuery("exec sp_DetalleFac '" & DocEntry & "'")
+        oRecord.DoQuery("exec SP_DetalleFac '" & DocEntry & "','13'")
 
 
         If oRecord.RecordCount > 0 Then
@@ -1343,13 +1458,13 @@ Public Class localizacion
                 Dim oRecord2 As SAPbobsCOM.Recordset
                 oRecord2 = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
                 writer.WriteStartElement("detalle")
-                createNode("descripcion", oRecord.Fields.Item(0).Value.ToString, writer)
-                createNode("cantidad", oRecord.Fields.Item(1).Value.ToString, writer)
-                createNode("precioUnitario", oRecord.Fields.Item(2).Value.ToString, writer)
-                createNode("descuento", oRecord.Fields.Item(3).Value.ToString, writer)
-                createNode("precioTotalSinImpuesto", oRecord.Fields.Item(4).Value.ToString, writer)
+                createNode("codigoPrincipal", oRecord.Fields.Item(0).Value.ToString, writer)
+                createNode("descripcion", oRecord.Fields.Item(1).Value.ToString, writer)
+                createNode("cantidad", oRecord.Fields.Item(2).Value.ToString, writer)
+                createNode("precioUnitario", oRecord.Fields.Item(3).Value.ToString, writer)
+                createNode("descuento", oRecord.Fields.Item(4).Value.ToString, writer)
                 writer.WriteStartElement("impuestos")
-                oRecord2.DoQuery("exec SP_Impuesto_Detalle '" & DocEntry & "','" & oRecord.Fields.Item(5).Value.ToString & "'")
+                oRecord2.DoQuery("exec SP_Impuesto_Detalle '" & DocEntry & "','" & oRecord.Fields.Item(0).Value.ToString & "','13'")
                 If oRecord2.RecordCount > 0 Then
                     While oRecord2.EoF = False
                         writer.WriteStartElement("impuesto")
@@ -1357,7 +1472,7 @@ Public Class localizacion
                         createNode("codigoPorcentaje", oRecord2.Fields.Item(1).Value.ToString, writer)
                         createNode("tarifa", oRecord2.Fields.Item(3).Value.ToString, writer)
                         createNode("baseImponible", oRecord2.Fields.Item(2).Value.ToString, writer)
-                        createNode("valor", oRecord2.Fields.Item(2).Value.ToString, writer)
+                        createNode("valor", oRecord2.Fields.Item(4).Value.ToString, writer)
                         writer.WriteEndElement()
                         oRecord2.MoveNext()
                     End While
@@ -1383,7 +1498,6 @@ Public Class localizacion
 
     Private Sub createNode(ByVal pID As String, ByVal pName As String, ByVal writer As XmlTextWriter)
         writer.WriteStartElement(pID)
-
         writer.WriteString(pName)
         writer.WriteEndElement()
 
@@ -1407,9 +1521,9 @@ Public Class localizacion
                         Dim oTypeNum = Nothing
                         If fila(8).ToString = "Neto" Then
                             oTypeNum = SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net
-                            SetNewTax(fila(1), fila(3).ToString, SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, Double.Parse(fila(9).ToString), fila(10), "99999", fila(13).ToString, IIf(fila(7).ToString = "", 0, Double.Parse(fila(7).ToString)))
+                            SetNewTax(fila(1), fila(3).ToString, SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, Double.Parse(fila(9).ToString), fila(10), "1-1-010-10-001", fila(13).ToString, IIf(fila(7).ToString = "", 0, Double.Parse(fila(7).ToString)))
                         ElseIf fila(8).ToString = "IVA" Then
-                            SetNewTax(fila(1), fila(3).ToString, SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_VAT, Double.Parse(fila(9).ToString), fila(10), "99999", fila(13).ToString, IIf(fila(7).ToString = "", 0, Double.Parse(fila(7).ToString)))
+                            SetNewTax(fila(1), fila(3).ToString, SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_VAT, Double.Parse(fila(9).ToString), fila(10), "1-1-010-10-001", fila(13).ToString, IIf(fila(7).ToString = "", 0, Double.Parse(fila(7).ToString)))
                         End If
 
                     End If
@@ -1422,6 +1536,18 @@ Public Class localizacion
             MessageBox.Show(ex.Message)
         End Try
 
+    End Sub
+
+    Private Sub SetFomsUDO()
+        Dim ChildTables As New List(Of String)
+        Dim findCols As New List(Of String)
+        Try
+            UDT_UF.AddUDOForm(Me.oCompany, "GREMISION", "GUIA DE REMISION", "GREMISION", SAPbobsCOM.BoUDOObjType.boud_MasterData)
+            UDT_UF.AddUDOForm(Me.oCompany, "TGUIA", "TIPO DE GUIA", "TGUIA", SAPbobsCOM.BoUDOObjType.boud_MasterData)
+        Catch ex As Exception
+
+        End Try
+        
     End Sub
 
 End Class

@@ -1,0 +1,57 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<iva>
+  <TipoIDInformante>R</TipoIDInformante>
+  <IdInformante>1102903588001</IdInformante>
+  <razonSocial>CONELSA CONDUCTORES ELECTRICOS SA</razonSocial>
+  <Anio>2017</Anio>
+  <Mes>2</Mes>
+  <numEstabRuc>001</numEstabRuc>
+  <totalVentas />
+  <codigoOperativo>IVA</codigoOperativo>
+  <compras>
+    <detalleCompras>
+      <codSustento>1</codSustento>
+      <tpIdProv>01</tpIdProv>
+      <idProv>1792603137001</idProv>
+      <tipoComprobante>15</tipoComprobante>
+      <parteRel />
+      <fechaRegistro>27/02/2017</fechaRegistro>
+      <establecimiento>001</establecimiento>
+      <puntoEmision>006</puntoEmision>
+      <secuencial>1235489</secuencial>
+      <fechaEmision>27/02/2017</fechaEmision>
+      <autorizacion />
+      <baseNoGraIva>0</baseNoGraIva>
+      <baseImponible>0</baseImponible>
+      <baseImpGrav>0</baseImpGrav>
+      <baseImpExe>0</baseImpExe>
+      <baseImpExe>0</baseImpExe>
+      <montoIva>0</montoIva>
+      <montoIce>94050</montoIce>
+      <valRetBien10>0.00</valRetBien10>
+      <valRetServ20>0.00</valRetServ20>
+      <valorRetBienes>0.00</valorRetBienes>
+      <valRetServ50>0.00</valRetServ50>
+      <valorRetServicios>0.00</valorRetServicios>
+      <valRetServ100>0.00</valRetServ100>
+      <totbasesImpReemb>0.00</totbasesImpReemb>
+      <pagoExterior>
+        <pagoLocExt>01</pagoLocExt>
+        <paisEfecPago>NA</paisEfecPago>
+        <aplicConvDobTrib>NA</aplicConvDobTrib>
+        <pagExtSujRetNorLeg>NA</pagExtSujRetNorLeg>
+      </pagoExterior>
+      <detalleAir>
+        <codRetAir>304E</codRetAir>
+        <baseImpAir>495000</baseImpAir>
+        <porcentajeAir>8</porcentajeAir>
+        <valRetAir>39600</valRetAir>
+      </detalleAir>
+      <estabRetencion1>001</estabRetencion1>
+      <ptoEmiRetencion1>001</ptoEmiRetencion1>
+      <secRetencion1>0000000</secRetencion1>
+      <autRetencion1 />
+      <fechaEmiRet1>27/02/2017</fechaEmiRet1>
+    </detalleCompras>
+  </compras>
+</iva>
