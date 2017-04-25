@@ -28,6 +28,8 @@ Public Class generarFXML
             createNode("secuencial", oRecord.Fields.Item("secuencial").Value.ToString.PadLeft(9, "0"), writer)
             createNode("dirMatriz", oRecord.Fields.Item("dirMatriz").Value.ToString, writer)
             Dim direccion = oRecord.Fields.Item("dirMatriz").Value.ToString
+            Dim oContriEspecial = oRecord.Fields.Item("contriespecial").Value
+            Dim oObliconta = oRecord.Fields.Item("contaobligado").Value
             ''Cierre info Tributaria
             writer.WriteEndElement()
 
@@ -39,11 +41,11 @@ Public Class generarFXML
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
             oRecord.DoQuery("exec SP_INFO_FACTURA '" & DocEntry & "','13'")
             createNode("fechaEmision", Date.Parse(oRecord.Fields.Item("DATE").Value.ToString).ToString("dd/MM/yyyy"), writer)
-            createNode("dirEstablecimiento", oRecord.Fields.Item(1).Value, writer)
-            createNode("contribuyenteEspecial", oRecord.Fields.Item(2).Value, writer)
-            createNode("obligadoContabilidad", oRecord.Fields.Item(3).Value, writer)
+            createNode("dirEstablecimiento", direccion, writer)
+            createNode("contribuyenteEspecial", oContriEspecial, writer)
+            createNode("obligadoContabilidad", oObliconta, writer)
             createNode("tipoIdentificacionComprador", oRecord.Fields.Item("U_IDENTIFICACION").Value.ToString, writer)
-            createNode("guiaRemision", "", writer)
+            'createNode("guiaRemision", "", writer)
             createNode("razonSocialComprador", oRecord.Fields.Item("CardName").Value.ToString, writer)
             createNode("identificacionComprador", oRecord.Fields.Item("U_DOCUMENTO").Value.ToString, writer)
             createNode("totalSinImpuestos", oRecord.Fields.Item("sin_impuesto").Value.ToString, writer)
@@ -82,7 +84,7 @@ Public Class generarFXML
 
             writer.WriteStartElement("pagos")
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            oRecord.DoQuery("exec SP_Forma_Pago '" & DocEntry & "'")
+            oRecord.DoQuery("exec SP_Forma_Pago '" & DocEntry & "','13'")
             If oRecord.RecordCount > 0 Then
                 While oRecord.EoF = False
                     writer.WriteStartElement("pago")
@@ -121,6 +123,7 @@ Public Class generarFXML
                     createNode("cantidad", oRecord.Fields.Item(2).Value.ToString, writer)
                     createNode("precioUnitario", oRecord.Fields.Item(3).Value.ToString, writer)
                     createNode("descuento", oRecord.Fields.Item(4).Value.ToString, writer)
+                    createNode("precioTotalSinImpuesto", oRecord.Fields.Item(6).Value.ToString, writer)
                     writer.WriteStartElement("impuestos")
                     oRecord2.DoQuery("exec SP_Impuesto_Detalle '" & DocEntry & "','" & oRecord.Fields.Item(0).Value.ToString & "','13'")
                     If oRecord2.RecordCount > 0 Then

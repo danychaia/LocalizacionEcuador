@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<factura id="comprobante" version="2.0.0">
+  <infoTributaria>
+    <razonSocial>CONELSA CONDUCTORES ELECTRICOS SA</razonSocial>
+    <ruc>1790015785001</ruc>
+    <codDoc>01</codDoc>
+    <estab>001</estab>
+    <ptoEmi>002</ptoEmi>
+    <secuencial>000000300</secuencial>
+    <dirMatriz>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirMatriz>
+  </infoTributaria>
+  <infoFactura>
+    <fechaEmision>31/03/2017</fechaEmision>
+    <dirEstablecimiento>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirEstablecimiento>
+    <contribuyenteEspecial>23232</contribuyenteEspecial>
+    <obligadoContabilidad>SI</obligadoContabilidad>
+    <tipoIdentificacionComprador>04</tipoIdentificacionComprador>
+    <razonSocialComprador>PROVEEDOR PRUEBA</razonSocialComprador>
+    <identificacionComprador>1792603137001</identificacionComprador>
+    <totalSinImpuestos>920</totalSinImpuestos>
+    <totalDescuento>0</totalDescuento>
+    <codDocReembolso>41</codDocReembolso>
+    <totalComprobantesReembolso>1110</totalComprobantesReembolso>
+    <totalBaseImponibleReembolso>920</totalBaseImponibleReembolso>
+    <totalImpuestoReembolso>190</totalImpuestoReembolso>
+    <totalConImpuestos>
+      <totalImpuesto>
+        <codigo>2</codigo>
+        <codigoPorcentaje>2</codigoPorcentaje>
+        <baseImponible>1000</baseImponible>
+        <tarifa>12</tarifa>
+        <valor>190</valor>
+      </totalImpuesto>
+    </totalConImpuestos>
+    <propina>0.00</propina>
+    <importeTotal>1110</importeTotal>
+    <moneda>DOLAR</moneda>
+    <pagos>
+      <pago>
+        <formaPago />
+        <total>1110</total>
+        <plazo>0</plazo>
+        <unidadTiempo>dias</unidadTiempo>
+      </pago>
+    </pagos>
+  </infoFactura>
+  <detalles>
+    <detalle>
+      <codigoPrincipal>A00001</codigoPrincipal>
+      <descripcion>IBM Infoprint 1312</descripcion>
+      <cantidad>1</cantidad>
+      <precioUnitario>1000</precioUnitario>
+      <descuento>0</descuento>
+      <precioTotalSinImpuesto>1000</precioTotalSinImpuesto>
+      <impuestos>
+        <impuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>2</codigoPorcentaje>
+          <tarifa>14</tarifa>
+          <baseImponible>1000</baseImponible>
+          <valor>190</valor>
+        </impuesto>
+      </impuestos>
+    </detalle>
+  </detalles>
+  <reembolsos>
+    <reembolsoDetalle>
+      <tipoIdentificacionProveedorReembolso>01</tipoIdentificacionProveedorReembolso>
+      <identificacionProveedorReembolso>1891709478001</identificacionProveedorReembolso>
+      <codPaisPagoProveedorReembolso>653</codPaisPagoProveedorReembolso>
+      <tipoProveedorReembolso>01</tipoProveedorReembolso>
+      <codDocReembolso>01</codDocReembolso>
+      <estabDocReembolso>002</estabDocReembolso>
+      <ptoEmiDocReembolso>001</ptoEmiDocReembolso>
+      <secuencialDocReembolso>000000023</secuencialDocReembolso>
+      <fechaEmisionDocReembolso>31/03/2017</fechaEmisionDocReembolso>
+      <numeroautorizacionDocReemb>0021568923</numeroautorizacionDocReemb>
+      <detalleImpuestos>
+        <detalleImpuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>2</codigoPorcentaje>
+          <tarifa>14</tarifa>
+          <baseImponibleReembolso>1000</baseImponibleReembolso>
+          <impuestoReembolso>190</impuestoReembolso>
+        </detalleImpuesto>
+      </detalleImpuestos>
+    </reembolsoDetalle>
+  </reembolsos>
+</factura>

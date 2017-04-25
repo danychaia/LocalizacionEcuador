@@ -6,36 +6,35 @@
     <codDoc>01</codDoc>
     <estab>001</estab>
     <ptoEmi>002</ptoEmi>
-    <secuencial>000000286</secuencial>
+    <secuencial>000000299</secuencial>
     <dirMatriz>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirMatriz>
   </infoTributaria>
   <infoFactura>
-    <fechaEmision>23/02/2017</fechaEmision>
-    <dirEstablecimiento>CHILE</dirEstablecimiento>
-    <contribuyenteEspecial>23232</contribuyenteEspecial>
+    <fechaEmision>03/04/2017</fechaEmision>
+    <dirEstablecimiento>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirEstablecimiento>
+    <contribuyenteEspecial>56234</contribuyenteEspecial>
     <obligadoContabilidad>SI</obligadoContabilidad>
     <tipoIdentificacionComprador>04</tipoIdentificacionComprador>
-    <guiaRemision />
-    <razonSocialComprador>COMERCIAL PADILLA S.C.C</razonSocialComprador>
-    <identificacionComprador>1792603137001</identificacionComprador>
-    <totalSinImpuestos>440000</totalSinImpuestos>
+    <razonSocialComprador>PRUEBARETENCION</razonSocialComprador>
+    <identificacionComprador>1712267770001</identificacionComprador>
+    <totalSinImpuestos>220000</totalSinImpuestos>
     <totalDescuento>0</totalDescuento>
     <totalConImpuestos>
       <totalImpuesto>
         <codigo>2</codigo>
         <codigoPorcentaje>2</codigoPorcentaje>
-        <baseImponible>440000</baseImponible>
+        <baseImponible>220000</baseImponible>
         <tarifa>12</tarifa>
-        <valor>83600</valor>
+        <valor>41800</valor>
       </totalImpuesto>
     </totalConImpuestos>
     <propina>0.00</propina>
-    <importeTotal>523600</importeTotal>
+    <importeTotal>261800</importeTotal>
     <moneda>DOLAR</moneda>
     <pagos>
       <pago>
-        <formaPago>20</formaPago>
-        <total>523600</total>
+        <formaPago>01</formaPago>
+        <total>261800</total>
         <plazo>0</plazo>
         <unidadTiempo>dias</unidadTiempo>
       </pago>
@@ -43,18 +42,19 @@
   </infoFactura>
   <detalles>
     <detalle>
-      <codigoPrincipal>A00005</codigoPrincipal>
-      <descripcion>HP Color Laser Jet 4</descripcion>
-      <cantidad>2</cantidad>
+      <codigoPrincipal>A00001</codigoPrincipal>
+      <descripcion>IBM Infoprint 1312</descripcion>
+      <cantidad>1</cantidad>
       <precioUnitario>220000</precioUnitario>
       <descuento>0</descuento>
+      <precioTotalSinImpuesto>220000</precioTotalSinImpuesto>
       <impuestos>
         <impuesto>
           <codigo>2</codigo>
           <codigoPorcentaje>2</codigoPorcentaje>
           <tarifa>14</tarifa>
-          <baseImponible>440000</baseImponible>
-          <valor>83600</valor>
+          <baseImponible>220000</baseImponible>
+          <valor>41800</valor>
         </impuesto>
       </impuestos>
     </detalle>

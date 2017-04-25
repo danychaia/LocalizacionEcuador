@@ -6,18 +6,17 @@
     <codDoc>01</codDoc>
     <estab>001</estab>
     <ptoEmi>002</ptoEmi>
-    <secuencial>000000289</secuencial>
+    <secuencial>000000295</secuencial>
     <dirMatriz>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirMatriz>
   </infoTributaria>
   <infoFactura>
-    <fechaEmision>23/02/2017</fechaEmision>
-    <dirEstablecimiento>CHILE</dirEstablecimiento>
-    <contribuyenteEspecial>23232</contribuyenteEspecial>
+    <fechaEmision>31/03/2017</fechaEmision>
+    <dirEstablecimiento>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirEstablecimiento>
+    <contribuyenteEspecial>56234</contribuyenteEspecial>
     <obligadoContabilidad>SI</obligadoContabilidad>
     <tipoIdentificacionComprador>04</tipoIdentificacionComprador>
-    <guiaRemision />
-    <razonSocialComprador>COMERCIAL PADILLA S.C.C</razonSocialComprador>
-    <identificacionComprador>1792603137001</identificacionComprador>
+    <razonSocialComprador>PRUEBARETENCION</razonSocialComprador>
+    <identificacionComprador>1712267770001</identificacionComprador>
     <totalSinImpuestos>165550</totalSinImpuestos>
     <totalDescuento>0</totalDescuento>
     <totalConImpuestos>
@@ -48,6 +47,7 @@
       <cantidad>1</cantidad>
       <precioUnitario>165000</precioUnitario>
       <descuento>0</descuento>
+      <precioTotalSinImpuesto>165000</precioTotalSinImpuesto>
       <impuestos>
         <impuesto>
           <codigo>2</codigo>
@@ -64,6 +64,7 @@
       <cantidad>1</cantidad>
       <precioUnitario>550</precioUnitario>
       <descuento>0</descuento>
+      <precioTotalSinImpuesto>550</precioTotalSinImpuesto>
       <impuestos>
         <impuesto>
           <codigo>2</codigo>

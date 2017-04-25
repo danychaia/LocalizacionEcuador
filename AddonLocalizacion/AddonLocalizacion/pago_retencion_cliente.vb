@@ -328,8 +328,8 @@
             gridView.Columns.Item(2).Editable = False
             gridView.Columns.Item(3).Editable = False
             gridView.Columns.Item(4).Editable = False
-            gridView.Columns.Item(5).Editable = False
-            gridView.Columns.Item(6).Editable = False
+            gridView.Columns.Item(5).Editable = True
+            gridView.Columns.Item(6).Editable = True
             For index = 0 To gridView.Rows.Count - 1
                 BaseTotal += Double.Parse(gridView.DataTable.GetValue(gridView.DataTable.Columns.Item(5).Name, index))
                 RetencionTotal += Double.Parse(gridView.DataTable.GetValue(gridView.DataTable.Columns.Item(6).Name, index))

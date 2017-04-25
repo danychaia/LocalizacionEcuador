@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<factura id="comprobante" version="2.0.0">
+  <infoTributaria>
+    <razonSocial>CONELSA CONDUCTORES ELECTRICOS SA</razonSocial>
+    <ruc>1790015785001</ruc>
+    <codDoc>01</codDoc>
+    <estab>001</estab>
+    <ptoEmi>005</ptoEmi>
+    <secuencial>1100000028</secuencial>
+    <dirMatriz>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirMatriz>
+  </infoTributaria>
+  <infoFactura>
+    <fechaEmision>24/04/2017</fechaEmision>
+    <dirEstablecimiento>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirEstablecimiento>
+    <contribuyenteEspecial>5368</contribuyenteEspecial>
+    <obligadoContabilidad>SI</obligadoContabilidad>
+    <tipoIdentificacionComprador>04</tipoIdentificacionComprador>
+    <razonSocialComprador>SANGUÑA RAMIREZ PAUL RICHARD</razonSocialComprador>
+    <identificacionComprador>1712228269001</identificacionComprador>
+    <totalSinImpuestos>23000</totalSinImpuestos>
+    <totalDescuento>0</totalDescuento>
+    <totalConImpuestos>
+      <totalImpuesto>
+        <codigo>2</codigo>
+        <codigoPorcentaje>3</codigoPorcentaje>
+        <baseImponible>23000</baseImponible>
+        <tarifa>14</tarifa>
+        <valor>3220</valor>
+      </totalImpuesto>
+    </totalConImpuestos>
+    <propina>0.00</propina>
+    <importeTotal>26220</importeTotal>
+    <moneda>DOLAR</moneda>
+    <pagos>
+      <pago>
+        <formaPago>01</formaPago>
+        <total>26220</total>
+        <plazo>30</plazo>
+        <unidadTiempo>dias</unidadTiempo>
+      </pago>
+    </pagos>
+  </infoFactura>
+  <detalles>
+    <detalle>
+      <codigoPrincipal>000004</codigoPrincipal>
+      <descripcion>TOSCANA MACARRON UNO CT 400GR</descripcion>
+      <cantidad>1000</cantidad>
+      <precioUnitario>23</precioUnitario>
+      <descuento>0</descuento>
+      <precioTotalSinImpuesto>23000</precioTotalSinImpuesto>
+      <impuestos>
+        <impuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>3</codigoPorcentaje>
+          <tarifa>14</tarifa>
+          <baseImponible>23000</baseImponible>
+          <valor>3220</valor>
+        </impuesto>
+      </impuestos>
+    </detalle>
+  </detalles>
+</factura>

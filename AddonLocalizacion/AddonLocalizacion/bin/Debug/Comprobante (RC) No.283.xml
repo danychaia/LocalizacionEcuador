@@ -1,22 +1,0 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<comprobanteRetencion id="comprobante" version="1.0.0">
-  <infoTributaria>
-    <razonSocial>CONELSA CONDUCTORES ELECTRICOS SA</razonSocial>
-    <ruc>1790015785001</ruc>
-    <codDoc>07</codDoc>
-    <estab>001</estab>
-    <ptoEmi>001</ptoEmi>
-    <secuencial>000000012</secuencial>
-    <dirMatriz>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirMatriz>
-  </infoTributaria>
-  <infoCompRetencion>
-    <fechaEmision>27/02/2017</fechaEmision>
-    <dirEstablecimiento>CALLE 12 AVENIDA PRUEBA CHILE</dirEstablecimiento>
-    <contribuyenteEspecial>23232</contribuyenteEspecial>
-    <obligadoContabilidad>SI</obligadoContabilidad>
-    <tipoIdentificacionSujetoRetenido>04</tipoIdentificacionSujetoRetenido>
-    <razonSocialSujetoRetenido>PROVEEDOR PRUEBA</razonSocialSujetoRetenido>
-    <identificacionSujetoRetenido>1792603137001</identificacionSujetoRetenido>
-    <periodoFiscal>2017/2</periodoFiscal>
-  </infoCompRetencion>
-</comprobanteRetencion>

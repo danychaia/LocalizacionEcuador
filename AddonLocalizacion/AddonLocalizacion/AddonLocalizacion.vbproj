@@ -73,6 +73,7 @@
     <Import Include="System.Threading.Tasks" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="cheques_posfechados.vb" />
     <Compile Include="comprobantes_autorizados.vb" />
     <Compile Include="fact_compro.vb" />
     <Compile Include="guia_remision.vb" />
@@ -102,12 +103,17 @@
     <Compile Include="retencion_numeros.vb" />
     <Compile Include="series.vb" />
     <Compile Include="SubMain.vb" />
+    <Compile Include="tools\generarFEXML.vb" />
+    <Compile Include="tools\generarFRXML.vb" />
     <Compile Include="tools\generarFXML.vb" />
+    <Compile Include="tools\generarGRXML.vb" />
     <Compile Include="tools\generarNCXML.vb" />
+    <Compile Include="tools\generarNDXML.vb" />
     <Compile Include="tools\generarRetencionXML.vb" />
     <Compile Include="tools\UDT_UF.vb" />
     <Compile Include="tools\validValues.vb" />
     <Compile Include="tools\withHolding.vb" />
+    <Compile Include="transportista.vb" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="My Project\Resources.resx">
