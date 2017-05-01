@@ -180,47 +180,51 @@
             End If
             If pVal.Before_Action = True And pVal.FormUID = "pCliente" And pVal.ItemUID = "Item_21" Then
                 Try
-                    Dim txtCliente As SAPbouiCOM.EditText = oForm.Items.Item("1").Specific
                     Dim txtDocumento As SAPbouiCOM.EditText = oForm.Items.Item("Item_3").Specific
+                    Dim txtCliente As SAPbouiCOM.EditText = oForm.Items.Item("1").Specific
                     Dim txtTotalB As SAPbouiCOM.EditText = oForm.Items.Item("Item_6").Specific
                     Dim txtTotalR As SAPbouiCOM.EditText = oForm.Items.Item("Item_10").Specific
                     Dim txtcuenta As SAPbouiCOM.EditText = oForm.Items.Item("Item_23").Specific
-                    ' cargarRetenciones(txtCliente.Value, txtDocumento.Value)
+                   
                     If validar(3) = False Then
                         BubbleEvent = False
                         Return
                     End If
-                    Dim vPay As SAPbobsCOM.Payments = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oIncomingPayments)
-                    vPay.CardCode = txtCliente.Value  ' ENTER HERE A VALID CARDCODE
-                    vPay.CashAccount = txtcuenta.Value ' ENTER HERE A VALID CASH G/L ACCOUNT
-                    If Double.Parse(txtTotalB.Value) > 0 And Double.Parse(txtTotalR.Value) <= 0 Then
-                        vPay.CashSum = Double.Parse(txtTotalB.Value)
-                        ' ENTER HERE A VALID AMOUNT (eg DocTotal)                        
-                    Else
-                        vPay.CashSum = Double.Parse(txtTotalR.Value)  ' ENTER HERE A VALID AMOUNT (eg DocTotal)
+                    Dim InPay As SAPbobsCOM.Payments
+                    'Dim oDownPay As SAPbobsCOM.Documents
+                    'oDownPay = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oIncomingPayments)                  
+                    InPay = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oIncomingPayments)
+
+                    ' oDownPay.GetByKey(Convert.ToInt32(sNewObjCode))
+
+                    InPay.CardCode = txtCliente.Value.Trim
+
+                    InPay.Invoices.DocEntry = txtDocumento.Value.Trim
+                    InPay.Invoices.InvoiceType = SAPbobsCOM.BoRcptInvTypes.it_Invoice
+                    InPay.Remarks = "Pago de Retencion Localizacion"
+                    If Double.Parse(txtTotalB.Value) > 0 Then
+                        InPay.CreditCards.CreditCard = 1  ' Mastercard = 1 , VISA = 2
+                        InPay.CreditCards.CardValidUntil = CDate("01/12/2020")
+                        InPay.CreditCards.CreditCardNumber = "1220" ' Just need 4 last digits
+                        InPay.CreditCards.CreditSum = txtTotalB.Value   ' Total Amount of the Invoice
+                        InPay.CreditCards.VoucherNum = "1234567" ' Need to give the Credit Card confirmation number.
+                        InPay.CreditCards.PaymentMethodCode = 1
                     End If
-
-                    vPay.DocDate = Date.Today()
-                    vPay.VatDate = Date.Today()
-                    vPay.DueDate = Date.Today()
-                    vPay.TaxDate = Date.Today()
-                    vPay.LocalCurrency = SAPbobsCOM.BoYesNoEnum.tYES
-
-                    vPay.Remarks = "Pago de retención"
-                    vPay.Invoices.DocEntry = txtDocumento.Value  ' ENTER HERE THE INVOICE DOCENTRY
-                    vPay.Invoices.DocLine = 0
-                    vPay.Invoices.InvoiceType = SAPbobsCOM.BoRcptInvTypes.it_Invoice
-                    If Double.Parse(txtTotalB.Value) > 0 And Double.Parse(txtTotalR.Value) <= 0 Then
-                        vPay.Invoices.SumApplied = Double.Parse(txtTotalB.Value)  ' ENTER HERE A VALID AMOUNT (eg DocTotal)
-                    Else
-                        vPay.Invoices.SumApplied = Double.Parse(txtTotalR.Value)  ' ENTER HERE A VALID AMOUNT (eg DocTotal)
+                    If Double.Parse(txtTotalR.Value) > 0 Then
+                        InPay.CreditCards.Add()
+                        InPay.CreditCards.CreditCard = 2  ' Mastercard = 1 , VISA = 2
+                        InPay.CreditCards.CardValidUntil = CDate("01/12/2020")
+                        InPay.CreditCards.CreditCardNumber = "1220" ' Just need 4 last digits
+                        InPay.CreditCards.CreditSum = Double.Parse(txtTotalR.Value)  ' Total Amount of the Invoice
+                        InPay.CreditCards.VoucherNum = "1234567" ' Need to give the Credit Card confirmation number.
+                        InPay.CreditCards.PaymentMethodCode = 2
                     End If
-                    'vPay.Invoices.SumApplied = 84  ' ENTER HERE A VALID AMOUNT (eg DocTotal)
-
-                    If (vPay.Add() <> 0) Then
-                        SBO_Application.SetStatusBarMessage(oCompany.GetLastErrorDescription, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+                    
+                    If InPay.Add() <> 0 Then
+                        SBOApplication.SetStatusBarMessage(oCompany.GetLastErrorDescription, SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                        MsgBox(oCompany.GetLastErrorDescription())
                     Else
-                        SBOApplication.StatusBar.SetText("Pago Ejecutado Correctamente", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success)
+                        SBOApplication.SetStatusBarMessage("Pago de retencion correcto!", SAPbouiCOM.BoMessageTime.bmt_Short, False)
                         oForm.Close()
                     End If
                     BubbleEvent = False
@@ -228,7 +232,8 @@
                 Catch ex As Exception
                     MessageBox.Show(ex.Message)
                 End Try
-
+                BubbleEvent = False
+                Return
             End If
         Catch ex As Exception
             SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
@@ -389,10 +394,10 @@
                     SBO_Application.SetStatusBarMessage("El existe monto a pagar", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                     Return False
                 End If
-                If txtCuenta.Value = "" Then
-                    SBO_Application.SetStatusBarMessage("Debe de seleccionar una Cuenta", SAPbouiCOM.BoMessageTime.bmt_Short, True)
-                    Return False
-                End If
+                ' If txtCuenta.Value = "" Then
+                'SBO_Application.SetStatusBarMessage("Debe de seleccionar una Cuenta", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                '  Return False
+                ' End If
             End If
 
         Catch ex As Exception

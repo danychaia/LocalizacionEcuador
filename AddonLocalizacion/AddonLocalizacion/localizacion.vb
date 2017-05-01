@@ -176,11 +176,10 @@ Public Class localizacion
             'SetNewTax("02", "513 0% a 22 % pago al exterior", SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, 100, "513", "1-1-010-10-000")
             'SetNewTax("03", "513A 0% a 22 % pago al exterior", SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, 100, "513A", "_SYS00000000128")
             'SetNewTax("04", "514 0% a 22 % pago al exterior", SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, 100, "514", "_SYS00000000128")
-
+           
             UDT_UF.SBOApplication = Me.SBO_Application
             UDT_UF.Company = Me.oCompany
-            'Dim a As New generarGRXML
-            'a.generarXML("23", "GR", oCompany, SBOApplication)
+            'PROBAR()
             cargarInicial(oCompany, SBO_Application)
             SBOApplication.StatusBar.SetText("AddOn de LOCALIZACIÓN iniciado...", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success)
         Catch ex As Exception
@@ -252,7 +251,7 @@ Public Class localizacion
             oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_POPUP
             oCreationPackage.UniqueID = "CRtn"
             oCreationPackage.Position = "2"
-            oCreationPackage.String = "Generar Comprobantes"
+            oCreationPackage.String = "ATS"
             oMenus.AddEx(oCreationPackage)
 
 
@@ -290,7 +289,7 @@ Public Class localizacion
             oMenus = oMenuItem.SubMenus
             oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING
             oCreationPackage.UniqueID = "rete"
-            oCreationPackage.String = "Comprobante para Retensión"
+            oCreationPackage.String = "Generar ATS"
             oMenus.AddEx(oCreationPackage)
 
             oMenuItem = SBO_Application.Menus.Item("gui")
@@ -873,7 +872,7 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "OCRD", "SEXO", 3, "SEXO", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)            
             UDT_UF.userField(oCompany, "OCRD", "ESTADO CIVIL", 3, "ESTADO_CIVIL", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             UDT_UF.userField(oCompany, "OCRD", "ORIGEN DE INGRESOS", 3, "O_INGRESOS", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
-
+            UDT_UF.userField(oCompany, "OCRD", "PARTE RELACIONADA", 25, "PT_RELACIO", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             'UDT_UF.userField(oCompany, "OCRD", "TIPO SUJETO", "TIPO_SUJETO", )
             UDT_UF.userTable(oCompany, "INF_TRIBUTARIA", "INFORMACION TRIBUTARIA", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
             UDT_UF.userTable(oCompany, "INF_PARTNER", "ADICIONAL AL PARTNER", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObjectAutoIncrement, False, SBOApplication)
@@ -1004,7 +1003,7 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "OPCH", "SUSTENTO TRIBUTARIO", 60, "SUS_TRIBU", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "TIPO COMPROBANTE", 45, "TI_COMPRO", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "SUJETO A RETENCION", 25, "SUJE_RETENCION", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
-            UDT_UF.userField(oCompany, "OPCH", "PARTE RELACIONADA", 25, "PT_RELACIO", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
+
             UDT_UF.userField(oCompany, "OPCH", "No. RETENCION", 45, "RETENCION_NO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "APLICAR RETENCION", 6, "A_APLICARR", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "DOC. MODIFICADO", 45, "D_MODIFICADO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
@@ -1022,6 +1021,7 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "OPCH", "GASTOS ADUANEROS", 45, "GASTOS_ADUANEROS", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "GASTOS TRANSPORTE OTROS", 45, "G_TRANS_OTROS", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "GUIA DE REMISION", 45, "G_REMISION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "TRANSPORTISTA", 60, "TRANSPORTISTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
 
             'CAMPOS PARA FACTURA DE REEEMBOLSO
             UDT_UF.userField(oCompany, "PCH1", "ID PROVEEDOR REEMBOLSO ", 13, "ID_PROVEEDOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
@@ -1045,6 +1045,20 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "PCH1", "NUMERO DE FACTURA ", 11, "N_FACTURA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "PCH1", "FECHA EMISON", 11, "FE_EMISION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "PCH1", "MONTO ICE ", 11, "MONTO_ICE", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+
+            'GUIA DE REMISION MASIVA ENCABEZADO
+            UDT_UF.userTable(oCompany, "GREMISION_M", "GUIA DE REMISION MASIVA", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_Document, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "SERIE", 19, "SERIE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "PUNTO PARTIDA", 30, "P_PARTIDA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "TRANSPORTISTA", 30, "R_TRANSPORTISTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "RAZON TRANSPORTISTA", 30, "RA_TRANSPORTISTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "PLACA", 30, "PLACA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "FECHA INICIAL", 30, "F_INICIAL", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "FECHA FINAL", 30, "F_FINAL", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "TIPO DOCUMENTO", 30, "T_DOCUMENTO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "MOTIVO TRASLADO", 60, "MOTIVO_TRASLADO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+
+
 
 
             UDT_UF.userTable(oCompany, "G_ULTIMO", "PAGO RETENCION", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObjectAutoIncrement, False, SBOApplication)
@@ -1439,7 +1453,7 @@ Public Class localizacion
             oValid.value = "02"
             oValid.descrip = "NO"
             validArray.Add(oValid)
-            UDT_UF.updateUserField(oCompany, "OPCH", "PT_RELACIO", validArray)
+            UDT_UF.updateUserField(oCompany, "OCRD", "PT_RELACIO", validArray)
             validArray.Clear()
 
          
@@ -1729,5 +1743,47 @@ Public Class localizacion
         End Try
         Return tipofac
     End Function
+
+    Private Sub PROBAR()
+        Try
+            Dim InPay As SAPbobsCOM.Payments            
+            'Dim oDownPay As SAPbobsCOM.Documents
+            'oDownPay = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oIncomingPayments)
+            Dim sNewObjCode As String = ""
+
+            oCompany.GetNewObjectCode(sNewObjCode) ' This Gets the key of the last created Transaction for this session
+
+            InPay = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oIncomingPayments)
+
+            ' oDownPay.GetByKey(Convert.ToInt32(sNewObjCode))
+
+            InPay.CardCode = "CN0990004196001"
+
+            InPay.Invoices.DocEntry = 26
+            InPay.Invoices.InvoiceType = SAPbobsCOM.BoRcptInvTypes.it_Invoice
+
+            InPay.CreditCards.CreditCard = 1  ' Mastercard = 1 , VISA = 2
+            InPay.CreditCards.CardValidUntil = CDate("01/12/2020")
+            InPay.CreditCards.CreditCardNumber = "1220" ' Just need 4 last digits
+            InPay.CreditCards.CreditSum = 8 ' Total Amount of the Invoice
+            InPay.CreditCards.VoucherNum = "1234567" ' Need to give the Credit Card confirmation number.
+            InPay.CreditCards.PaymentMethodCode = 1
+            InPay.CreditCards.Add()
+
+            InPay.CreditCards.CreditCard = 2  ' Mastercard = 1 , VISA = 2
+            InPay.CreditCards.CardValidUntil = CDate("01/12/2020")
+            InPay.CreditCards.CreditCardNumber = "1220" ' Just need 4 last digits
+            InPay.CreditCards.CreditSum = 8 ' Total Amount of the Invoice
+            InPay.CreditCards.VoucherNum = "1234567" ' Need to give the Credit Card confirmation number.
+            InPay.CreditCards.PaymentMethodCode = 2
+            If InPay.Add() <> 0 Then
+                MsgBox(oCompany.GetLastErrorDescription())
+            Else
+                MsgBox("Incoming payment Created!")
+            End If
+        Catch ex As Exception
+            MessageBox.Show(ex.Message)
+        End Try
+    End Sub
 
 End Class
