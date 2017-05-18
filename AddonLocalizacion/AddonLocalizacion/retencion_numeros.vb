@@ -171,7 +171,7 @@
             Dim gridView As SAPbouiCOM.Grid
             gridView = oForm.Items.Item("Item_0").Specific
             gridView.SelectionMode = SAPbouiCOM.BoMatrixSelect.ms_Single
-            Dim sql As String = "EXEC SERIES_PTO_ESTABLE '3','','','','','','','','',''"
+            Dim sql As String = "EXEC SERIES_PTO_ESTABLE '3','','','','','','','','','','','',''"
             oForm.DataSources.DataTables.Item(0).ExecuteQuery(sql)
             gridView.DataTable = oForm.DataSources.DataTables.Item("MyDataTable")
             gridView.AutoResizeColumns()

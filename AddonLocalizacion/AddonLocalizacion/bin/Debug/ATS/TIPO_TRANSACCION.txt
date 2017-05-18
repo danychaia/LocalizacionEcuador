@@ -1,0 +1,7 @@
+1	Compra
+2	Venta
+4	Exportación
+5	Tarjetas de Crédito
+6	Rendimientos Financieros
+7	Fondos y Financiero
+8	Otros ingresos del exterior

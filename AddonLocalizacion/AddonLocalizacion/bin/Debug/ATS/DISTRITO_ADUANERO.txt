@@ -1,0 +1,14 @@
+019	Gquil-Aéreo
+028	Gquil-Marítimo
+037	Manta
+046	Esmeraldas
+055	Quito
+064	Pto-Bolívar
+073	Tulcán
+082	Huaquillas
+091	Cuenca
+109	Loja-Macara
+118	Sta Elena
+127	Latacunga
+136	Gerencia General
+145	CEBAF – San Miguel 

@@ -79,8 +79,35 @@
                             Catch ex As Exception
 
                             End Try
+                        Else
+                            If (pVal.ItemUID = "Item_8") Then
+                                Try
+                                    Dim txtCuenta As SAPbouiCOM.EditText = oForm.Items.Item("Item_8").Specific
 
-                        End If
+                                    ' Dim txtNomEmp As SAPbouiCOM.EditText = oForm.Items.Item("1000008").Specific
+                                    val = oDataTable.GetValue("CreditCard", 0)
+
+                                    txtCuenta.Value = val
+                                Catch ex As Exception
+
+                                End Try
+                            Else
+                                If (pVal.ItemUID = "Item_16") Then
+                                    Try
+                                        Dim txtCuenta As SAPbouiCOM.EditText = oForm.Items.Item("Item_16").Specific
+
+                                        ' Dim txtNomEmp As SAPbouiCOM.EditText = oForm.Items.Item("1000008").Specific
+                                        val = oDataTable.GetValue("CreditCard", 0)
+
+                                        txtCuenta.Value = val
+                                    Catch ex As Exception
+
+                                    End Try
+
+                                End If
+                            End If
+
+                            End If
                     End If
 
                 End If
@@ -90,7 +117,8 @@
                 Dim txtRazon As SAPbouiCOM.EditText = oForm.Items.Item("Item_3").Specific
                 Dim txtBase As SAPbouiCOM.ComboBox = oForm.Items.Item("Item_4").Specific
                 Dim txtRetencion As SAPbouiCOM.ComboBox = oForm.Items.Item("Item_10").Specific
-
+                Dim txtcuentab As SAPbouiCOM.EditText = oForm.Items.Item("Item_8").Specific
+                Dim txtcuentar As SAPbouiCOM.EditText = oForm.Items.Item("Item_16").Specific
                 If txtCliente.Value = "" Then
                     SBO_Application.SetStatusBarMessage("Debe de Seleccionar un cliente", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
                     BubbleEvent = False
@@ -108,12 +136,20 @@
                 End If
                 Dim orecord As SAPbobsCOM.Recordset
                 orecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-                Dim sql As String = "exec INF_PARTNER_OPE 1,'" & txtCliente.Value & "','" & txtRazon.Value & "','" & txtBase.Value.Trim & "','" & txtRetencion.Value.Trim & "'"
+                Dim sql As String = "exec INF_PARTNER_OPE 1,'" & txtCliente.Value & "','" & txtRazon.Value & "','" & txtBase.Value.Trim & "','" & txtRetencion.Value.Trim & "'" & ",'" & txtcuentab.Value.Trim & "'" & ",'" & txtcuentar.Value.Trim & "'"
                 orecord.DoQuery(sql)
+                If orecord.Fields.Item(0).Value = "0" Then
+                    SBO_Application.SetStatusBarMessage("Configuración ingresada correctamente", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
+                Else
+                    SBO_Application.SetStatusBarMessage(orecord.Fields.Item(0).Value, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+                End If
+
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
                 orecord = Nothing
                 GC.Collect()
                 carcarSeries(txtCliente.Value)
+                BubbleEvent = False
+                Return
             End If
 
             If pVal.FormUID = "rCliente" And pVal.Before_Action = True And pVal.ItemUID = "Item_12" Then
@@ -125,6 +161,8 @@
                 End If
 
                 carcarSeries(txtCliente.Value)
+                BubbleEvent = False
+                Return
             End If
         Catch ex As Exception
             SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
@@ -155,7 +193,7 @@
             Dim gridView As SAPbouiCOM.Grid
             gridView = oForm.Items.Item("Item_9").Specific
             gridView.SelectionMode = SAPbouiCOM.BoMatrixSelect.ms_Single
-            Dim sql As String = "exec INF_PARTNER_OPE 2,'" & cliente & "','','',''"
+            Dim sql As String = "exec INF_PARTNER_OPE 2,'" & cliente & "','','','','',''"
             oForm.DataSources.DataTables.Item(0).ExecuteQuery(sql)
             gridView.DataTable = oForm.DataSources.DataTables.Item("MyDataTable")
             gridView.AutoResizeColumns()
@@ -164,9 +202,12 @@
             gridView.Columns.Item(2).Editable = False
             gridView.Columns.Item(3).Editable = False
             gridView.Columns.Item(4).Editable = False
+            gridView.Columns.Item(5).Editable = False
+            gridView.Columns.Item(6).Editable = False
             System.Runtime.InteropServices.Marshal.ReleaseComObject(gridView)
             gridView = Nothing
             GC.Collect()
+            Return
         Catch ex As Exception
             Me.SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, False)
         End Try

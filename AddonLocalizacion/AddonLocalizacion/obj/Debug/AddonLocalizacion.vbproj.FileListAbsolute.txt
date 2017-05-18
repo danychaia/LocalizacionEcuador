@@ -10,8 +10,8 @@ C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocaliz
 C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.xml
 C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\obj\Debug\AddonLocalizacion.Resources.resources
 C:\Users\DANY\Desktop\AddonLocalizacion\AddonLocalizacion\obj\Debug\AddonLocalizacion.vbproj.GenerateResource.Cache
-C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.exe
 C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.exe.config
+C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.exe
 C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.pdb
 C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\bin\Debug\AddonLocalizacion.xml
 C:\Users\DANNY\documents\visual studio 2013\Projects\AddonLocalizacion\AddonLocalizacion\obj\Debug\Interop.SAPbobsCOM.dll

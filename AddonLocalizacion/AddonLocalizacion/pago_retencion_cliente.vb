@@ -15,17 +15,23 @@
             Me.oCompany = UDT_UF.Company
 
             If UDT_UF.ActivateFormIsOpen(SBO_Application, "pCliente") = False Then
+                
                 LoadFromXML(XmlForm)
                 oForm = SBO_Application.Forms.Item("pCliente")
                 oForm.Left = 400
                 oForm.Visible = True
                 oForm.PaneLevel = 1
                 oForm.DataSources.DataTables.Add("MyDataTable")
+                Dim txtFechaReten As SAPbouiCOM.EditText = oForm.Items.Item("Item_29").Specific
+                Dim txtCaducidad As SAPbouiCOM.EditText = oForm.Items.Item("Item_31").Specific
+                oForm.DataSources.UserDataSources.Add("Date", SAPbouiCOM.BoDataType.dt_DATE)
+                oForm.DataSources.UserDataSources.Add("Date2", SAPbouiCOM.BoDataType.dt_DATE)
+                txtFechaReten.DataBind.SetBound(True, "", "Date")
+                txtCaducidad.DataBind.SetBound(True, "", "Date2")
 
             Else
                 oForm = Me.SBO_Application.Forms.Item("pCliente")
             End If
-
         Catch ex As Exception
             SBOApplication.SetStatusBarMessage(ex.Message)
         End Try
@@ -85,12 +91,28 @@
                                 Dim txtBaseImponible As SAPbouiCOM.EditText = oForm.Items.Item("Item_14").Specific
                                 Dim txtCliente As SAPbouiCOM.EditText = oForm.Items.Item("1").Specific
                                 Dim txtImpuesto As SAPbouiCOM.EditText = oForm.Items.Item("Item_18").Specific
-                                ' Dim txtNomEmp As SAPbouiCOM.EditText = oForm.Items.Item("1000008").Specific
-                                val = oDataTable.GetValue("DocEntry", 0)
-                                'UDT_UF.FilterCFL(oForm, "CFL_1", "DocEntry", val)
-                                txtBaseImponible.Value = Double.Parse(obtenerBaseImponible(val)).ToString("N2")
-                                txtCliente.Value = obtenerCliente(val)
-                                txtImpuesto.Value = Double.Parse(obtenerImpuesto(val)).ToString("N2")
+                                Dim oRecordB As SAPbobsCOM.Recordset = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                                Try
+                                    'UDT_UF.FilterCFL(oForm, "CFL_1", "DocEntry", val)
+                                    val = oDataTable.GetValue("DocEntry", 0)
+                                    txtBaseImponible.Value = Double.Parse(obtenerBaseImponible(val)).ToString("N2")
+                                    txtCliente.Value = obtenerCliente(val)
+                                    txtImpuesto.Value = Double.Parse(obtenerImpuesto(val)).ToString("N2")
+                                    oRecordB.DoQuery("EXEC INF_PAGO_RETENCION '3','" & txtCliente.Value & "','" & val & "',0,0,0,0")
+                                    If oRecordB.Fields.Item(0).Value = "YA EXISTE" Then
+                                        cargarRetenciones(txtCliente.Value.Trim, val)
+                                        SBOApplication.SetStatusBarMessage("A este documento ya se le ha aplicado pago de retención", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                    ElseIf oRecordB.Fields.Item(0).Value = "NO EXISTE" Then
+                                        cargarRetenciones(txtCliente.Value.Trim, val)
+                                    End If
+                                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordB)
+                                    oRecordB = Nothing
+                                    GC.Collect()
+                                Catch ex As Exception
+
+                                End Try
+
+                               
                                 Try
                                     Dim txtRuc As SAPbouiCOM.EditText = oForm.Items.Item("1").Specific
                                     ' Dim txtNomEmp As SAPbouiCOM.EditText = oForm.Items.Item("1000008").Specific
@@ -99,7 +121,7 @@
                                     Dim oretencion As SAPbouiCOM.ComboBox = oForm.Items.Item("Item_13").Specific
 
                                     'UDT_UF.FilterCFL(oForm, "CFL_1", "DocEntry", val)
-                                    Dim sql As String = "exec INF_PARTNER_OPE 2,'" & txtRuc.Value & "','','',''"
+                                    Dim sql As String = "exec INF_PARTNER_OPE 2,'" & txtRuc.Value & "','','','','',''"
                                     Try
                                         Dim orecord As SAPbobsCOM.Recordset
                                         orecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
@@ -128,6 +150,30 @@
                             End Try
 
                         End If
+                        If pVal.ItemUID = "Item_32" Then
+                            Try
+                                Dim txtCuenta As SAPbouiCOM.EditText = oForm.Items.Item("Item_32").Specific
+
+                                ' Dim txtNomEmp As SAPbouiCOM.EditText = oForm.Items.Item("1000008").Specific
+                                val = oDataTable.GetValue("CreditCard", 0)
+
+                                txtCuenta.Value = val
+                            Catch ex As Exception
+
+                            End Try
+                        End If
+                        If pVal.ItemUID = "Item_33" Then
+                            Try
+                                Dim txtCuenta As SAPbouiCOM.EditText = oForm.Items.Item("Item_33").Specific
+
+                                ' Dim txtNomEmp As SAPbouiCOM.EditText = oForm.Items.Item("1000008").Specific
+                                val = oDataTable.GetValue("CreditCard", 0)
+
+                                txtCuenta.Value = val
+                            Catch ex As Exception
+
+                            End Try
+                        End If
                     End If
                 End If               
             End If
@@ -147,7 +193,7 @@
                     BubbleEvent = False
                     Return
                 End If
-                Dim sql As String = "INF_PAGO_RETENCION '1','" & txtCliente.Value & "','" & txtDocumento.Value & "'," & oBase.Value.Trim & "," & oRetencion.Value & "," & (Double.Parse(oBase.Value) / 100) * Double.Parse(txtBaseImponible.Value) & "," & (Double.Parse(oRetencion.Value) / 100) * Double.Parse(Impuesto.Value)
+                Dim sql As String = "INF_PAGO_RETENCION '1','" & txtCliente.Value & "','" & txtDocumento.Value & "'," & oBase.Value.Trim & "," & oRetencion.Value & "," & (Double.Parse(oBase.Value) / 100) * Double.Parse(txtBaseImponible.Value) & "," & (IIf(oRetencion.Value.Trim = "", 0, Double.Parse(oRetencion.Value)) / 100) * Double.Parse(Impuesto.Value)
                 orecord.DoQuery(sql)
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
                 orecord = Nothing
@@ -184,12 +230,17 @@
                     Dim txtCliente As SAPbouiCOM.EditText = oForm.Items.Item("1").Specific
                     Dim txtTotalB As SAPbouiCOM.EditText = oForm.Items.Item("Item_6").Specific
                     Dim txtTotalR As SAPbouiCOM.EditText = oForm.Items.Item("Item_10").Specific
-                    Dim txtcuenta As SAPbouiCOM.EditText = oForm.Items.Item("Item_23").Specific
+                    Dim txtCuentaB As SAPbouiCOM.EditText = oForm.Items.Item("Item_32").Specific
+                    Dim txtCuentaR As SAPbouiCOM.EditText = oForm.Items.Item("Item_33").Specific
                    
                     If validar(3) = False Then
                         BubbleEvent = False
                         Return
                     End If
+
+
+
+                   
                     Dim InPay As SAPbobsCOM.Payments
                     'Dim oDownPay As SAPbobsCOM.Documents
                     'oDownPay = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oIncomingPayments)                  
@@ -203,7 +254,7 @@
                     InPay.Invoices.InvoiceType = SAPbobsCOM.BoRcptInvTypes.it_Invoice
                     InPay.Remarks = "Pago de Retencion Localizacion"
                     If Double.Parse(txtTotalB.Value) > 0 Then
-                        InPay.CreditCards.CreditCard = 1  ' Mastercard = 1 , VISA = 2
+                        InPay.CreditCards.CreditCard = txtCuentaB.Value    ' Mastercard = 1 , VISA = 2
                         InPay.CreditCards.CardValidUntil = CDate("01/12/2020")
                         InPay.CreditCards.CreditCardNumber = "1220" ' Just need 4 last digits
                         InPay.CreditCards.CreditSum = txtTotalB.Value   ' Total Amount of the Invoice
@@ -212,17 +263,17 @@
                     End If
                     If Double.Parse(txtTotalR.Value) > 0 Then
                         InPay.CreditCards.Add()
-                        InPay.CreditCards.CreditCard = 2  ' Mastercard = 1 , VISA = 2
+                        InPay.CreditCards.CreditCard = txtCuentaR.Value    ' Mastercard = 1 , VISA = 2
                         InPay.CreditCards.CardValidUntil = CDate("01/12/2020")
                         InPay.CreditCards.CreditCardNumber = "1220" ' Just need 4 last digits
                         InPay.CreditCards.CreditSum = Double.Parse(txtTotalR.Value)  ' Total Amount of the Invoice
                         InPay.CreditCards.VoucherNum = "1234567" ' Need to give the Credit Card confirmation number.
                         InPay.CreditCards.PaymentMethodCode = 2
                     End If
-                    
+                    InPay.Invoices.SumApplied = Double.Parse(txtTotalR.Value) + Double.Parse(txtTotalB.Value)
                     If InPay.Add() <> 0 Then
                         SBOApplication.SetStatusBarMessage(oCompany.GetLastErrorDescription, SAPbouiCOM.BoMessageTime.bmt_Short, True)
-                        MsgBox(oCompany.GetLastErrorDescription())
+                        'MsgBox(oCompany.GetLastErrorDescription())
                     Else
                         SBOApplication.SetStatusBarMessage("Pago de retencion correcto!", SAPbouiCOM.BoMessageTime.bmt_Short, False)
                         oForm.Close()
@@ -234,6 +285,12 @@
                 End Try
                 BubbleEvent = False
                 Return
+            End If
+
+            If pVal.EventType = SAPbouiCOM.BoEventTypes.et_FORM_CLOSE And pVal.BeforeAction = True Then
+                Me.oForm = Nothing
+                Me.oCompany = Nothing
+                Me.SBO_Application = Nothing
             End If
         Catch ex As Exception
             SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
@@ -360,6 +417,13 @@
             Dim txtCliente As SAPbouiCOM.EditText = oForm.Items.Item("1").Specific
             Dim txtDocumento As SAPbouiCOM.EditText = oForm.Items.Item("Item_3").Specific
             Dim txtCuenta As SAPbouiCOM.EditText = oForm.Items.Item("Item_23").Specific
+            Dim txtAutorizacion As SAPbouiCOM.EditText = oForm.Items.Item("Item_24").Specific
+            Dim txtNumeroReten As SAPbouiCOM.EditText = oForm.Items.Item("Item_27").Specific
+            Dim txtFechaReten As SAPbouiCOM.EditText = oForm.Items.Item("Item_29").Specific
+            Dim txtCaducidad As SAPbouiCOM.EditText = oForm.Items.Item("Item_31").Specific
+            Dim txtCuentaB As SAPbouiCOM.EditText = oForm.Items.Item("Item_32").Specific
+            Dim txtCuentaR As SAPbouiCOM.EditText = oForm.Items.Item("Item_33").Specific
+
             If tipo = 1 Then
                 If txtDocumento.Value = "" Then
                     SBO_Application.SetStatusBarMessage("Debe de seleccionar un Documento", SAPbouiCOM.BoMessageTime.bmt_Short, True)
@@ -369,10 +433,7 @@
                     SBO_Application.SetStatusBarMessage("Debe de seleccionar una Base", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                     Return False
                 End If
-                If oRetencion.Value.Trim = "" Then
-                    SBO_Application.SetStatusBarMessage("Debe de seleccionar una Retención", SAPbouiCOM.BoMessageTime.bmt_Short, True)
-                    Return False
-                End If
+               
             End If
             If tipo = 2 Then
                 If txtDocumento.Value = "" Then
@@ -394,11 +455,37 @@
                     SBO_Application.SetStatusBarMessage("El existe monto a pagar", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                     Return False
                 End If
+
+                If txtNumeroReten.Value.Trim = "" Then
+                    SBO_Application.SetStatusBarMessage("Debe de seleccionar un numero de retención", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                    Return False
+                End If
+                If txtAutorizacion.Value.Trim = "" Then
+                    SBO_Application.SetStatusBarMessage("Debe de ingresar una autorización", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                    Return False
+                End If
+                If txtFechaReten.Value.Trim = "" Then
+                    SBO_Application.SetStatusBarMessage("Debe de ingresar una fecha de retencion", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                    Return False
+                End If
+                If txtCaducidad.Value.Trim = "" Then
+                    SBO_Application.SetStatusBarMessage("Debe de ingresar una fecha de Caducidad", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                    Return False
+                End If
+                If txtCuentaB.Value.Trim = "" And Double.Parse(txtTotalB.Value) > 0 Then
+                    SBO_Application.SetStatusBarMessage("Debe seleccionar una cuenta como base", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                    Return False
+                End If
+                If txtCuentaR.Value.Trim = "" And Double.Parse(txtTotalR.Value) > 0 Then
+                    SBO_Application.SetStatusBarMessage("Debe seleccionar una cuenta como Retencion", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                    Return False
+                End If
                 ' If txtCuenta.Value = "" Then
                 'SBO_Application.SetStatusBarMessage("Debe de seleccionar una Cuenta", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                 '  Return False
                 ' End If
             End If
+
 
         Catch ex As Exception
 
@@ -406,4 +493,7 @@
 
         Return True
     End Function
+
+   
+
 End Class

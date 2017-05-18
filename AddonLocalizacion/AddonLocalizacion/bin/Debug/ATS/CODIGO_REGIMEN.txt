@@ -1,0 +1,14 @@
+40	Exportación definitiva
+50	Exportación temporal para reimportación en el mismo estado
+51	Exportación temporal para perfeccionamiento pasivo
+60	Reexp. de mercancías en el mismo estado
+61	Reexportación de mercancías que fueron importadas para perfeccionamiento activo
+79	Exportación a consumo desde Zona Franca
+83	Reembarque
+94	Courier exportación
+95	Exportaciones Correos del Ecuador
+109	Loja-Macara
+118	Sta Elena
+127	Latacunga
+136	Gerencia General
+145	CEBAF – San Miguel 

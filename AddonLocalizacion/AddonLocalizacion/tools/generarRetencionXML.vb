@@ -174,8 +174,8 @@ Public Class generarRetencionXML
             Dim doc As New XmlDocument
             Dim oRecord As SAPbobsCOM.Recordset
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            oRecord.DoQuery("SELECT A.DocEntry  FROM OPCH A WHERE A.DocEntry=" & DocEntry & " and A.U_TI_COMPRO='41' AND ISNULL(A.U_A_APLICARR,'01')='01'")
-            If oRecord.RecordCount = 0 Then
+            oRecord.DoQuery("SELECT A.DocEntry  FROM OPCH A WHERE A.DocEntry=" & DocEntry & " AND  ISNULL(A.U_A_APLICARR,'01')='01'")
+            If oRecord.RecordCount > 0 Then
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
                 oRecord = Nothing
                 GC.Collect()
