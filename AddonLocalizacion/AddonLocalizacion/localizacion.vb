@@ -128,6 +128,8 @@ Public Class localizacion
 
     Private Sub Class_Init()
         Try
+
+            'Dim oRecordA As SAPbobsCOM.Recordset
             '//*************************************************************
 
             '// set SBO_Application with an initialized application object
@@ -170,18 +172,30 @@ Public Class localizacion
 
             '//*************************************************************
 
-            SBO_Application.SetStatusBarMessage("DI Connected To: " & oCompany.CompanyName & vbNewLine & "Add-on is loaded", SAPbouiCOM.BoMessageTime.bmt_Short, False)            
+            SBO_Application.SetStatusBarMessage("DI Connected To: " & oCompany.CompanyName & vbNewLine & "Add-on is loaded", SAPbouiCOM.BoMessageTime.bmt_Short, False)
+
             SetNewItems()
             SetFomsUDO()
-            'SetNewTax("01", "512 0% a 22 % pago al exterior", SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, 100, "512", "1-1-010-10-000")
-            'SetNewTax("02", "513 0% a 22 % pago al exterior", SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, 100, "513", "1-1-010-10-000")
-            'SetNewTax("03", "513A 0% a 22 % pago al exterior", SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, 100, "513A", "_SYS00000000128")
-            'SetNewTax("04", "514 0% a 22 % pago al exterior", SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, 100, "514", "_SYS00000000128")
-           
+
             UDT_UF.SBOApplication = Me.SBO_Application
             UDT_UF.Company = Me.oCompany
-            'PROBAR()
-            cargarInicial(oCompany, SBO_Application)
+            ' PROBAR()
+            Dim oRecord As SAPbobsCOM.Recordset
+            oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+            oRecord.DoQuery("SELECT ISNULL(A.U_STATUS,'N') FROM  [@INF_APP] A")
+            If oRecord.RecordCount > 0 Then
+                If oRecord.Fields.Item(0).Value <> "I" Then
+                    System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
+                    oRecord = Nothing
+                    GC.Collect()
+                    cargarInicial(oCompany, SBO_Application)
+                End If
+            Else
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
+                oRecord = Nothing
+                GC.Collect()
+                cargarInicial(oCompany, SBO_Application)
+            End If
             SBOApplication.StatusBar.SetText("AddOn de LOCALIZACIÓN iniciado...", SAPbouiCOM.BoMessageTime.bmt_Short, SAPbouiCOM.BoStatusBarMessageType.smt_Success)
         Catch ex As Exception
             MessageBox.Show(ex.Message)
@@ -240,13 +254,13 @@ Public Class localizacion
             oMenus = oMenuItem.SubMenus
             oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING
             oCreationPackage.UniqueID = "pCli"
-            oCreationPackage.String = "Pagos Cliente"
+            oCreationPackage.String = "Retenciones en Venta"
             oMenus.AddEx(oCreationPackage)
           
             oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_POPUP
             oCreationPackage.UniqueID = "CRtn"
             oCreationPackage.Position = "2"
-            oCreationPackage.String = "ATS"
+            oCreationPackage.String = "Generar ATS"
             oMenus.AddEx(oCreationPackage)
 
 
@@ -663,7 +677,7 @@ Public Class localizacion
                 oNewItem.Top = oitem.Top
                 oNewItem.Height = oitem.Height
                 NewButton = oNewItem.Specific
-                NewButton.Caption = "Pago de Retencion"
+                NewButton.Caption = "Retenciones en venta"
                 ocmdFirma = myForm.Items.Item("btnPago")
                 ocmdFirma.Enabled = True
                 BubbleEvent = False
@@ -859,6 +873,13 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "@INF_PARTNER", "CUENTA BASE", 10, "B_CUENTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@INF_PARTNER", "CUENTA RETENCION", 10, "R_CUENTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
 
+
+            UDT_UF.userTable(oCompany, "INF_APP", "INFORMACION DE LA APLICACION", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INF_APP", "VERSION", 12, "VERSION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INF_APP", "FECHA", 12, "FECHA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INF_APP", "STATUS", 12, "STATUS", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+           
+
             UDT_UF.userTable(oCompany, "MUNI_CANTO", "CANTON O MUNICIPIO", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
             UDT_UF.userTable(oCompany, "PARROQUIAS", "PARROQUIAS", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
             UDT_UF.userField(oCompany, "@PARROQUIAS", "CANTON", 30, "CANTON", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
@@ -987,8 +1008,8 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "OPCH", "Tipo de Exportación", 3, "T_EXPORT", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Tipo de Ingresos del Exterior", 25, "T_INGRE_EXT", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Impuesto a la Renta o Similar Ext", 25, "IMPUESTO_RENTA", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
-            UDT_UF.userField(oCompany, "OPCH", "Valor IR o Similar en el Ext", 25, "IMPUESTO_RENTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "OPCH", "Fecha Embarque", 25, "F_EMBARQUE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Valor IR o Similar en el Ext", 25, "V_IR_SIMI", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Fecha Embarque", 25, "F_EMBARQUE", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Valor FOB", 25, "V_FOB", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Número de Transporte Ext.", 13, "N_TRASNPORT", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Distrito Aduanero", 13, "D_ADUANERO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
@@ -1067,7 +1088,7 @@ Public Class localizacion
             UDT_UF.userTable(oCompany, "LC_COD_REGIMEN", "CODIGO REGIMEN", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
             UDT_UF.userTable(oCompany, "LC_TARJ_CREDITO", "TARJETA DE CREDITO", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
             UDT_UF.userTable(oCompany, "PAIS", "REGISTRO DE PAIS", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
-            UDT_UF.userTable(oCompany, "LC_IMPUESTO", "CODIGO INPUESTO", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
+            UDT_UF.userTable(oCompany, "LC_IMPUESTO", "CODIGO IMPUESTO", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
             UDT_UF.userTable(oCompany, "LC_PORCENTAJE", "PORCENTAJE DE IMPUESTO", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
 
             UDT_UF.userTable(oCompany, "LC_T_FIDEICOMISOS", "TIPO FIDEICOMISOS", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
@@ -1282,7 +1303,7 @@ Public Class localizacion
             Dim tabla As String
             Dim campo As String
             Dim validArrayList As New ArrayList()
-            Using fileReader As New FileIO.TextFieldParser(Application.StartupPath & "\Sustentos.txt")
+            Using fileReader As New FileIO.TextFieldParser(Application.StartupPath & "\ATS\Sustentos.txt")
                 fileReader.TextFieldType = FileIO.FieldType.Delimited
                 fileReader.SetDelimiters(vbTab)
                 While Not fileReader.EndOfData
@@ -1303,7 +1324,7 @@ Public Class localizacion
                 End While
             End Using
 
-            Using fileReader As New FileIO.TextFieldParser(Application.StartupPath & "\Comprobantes.txt")
+            Using fileReader As New FileIO.TextFieldParser(Application.StartupPath & "\ATS\Comprobantes.txt")
                 fileReader.TextFieldType = FileIO.FieldType.Delimited
                 fileReader.SetDelimiters(vbTab)
                 While Not fileReader.EndOfData
@@ -1325,7 +1346,7 @@ Public Class localizacion
             End Using
 
 
-            Using fileReader As New FileIO.TextFieldParser(Application.StartupPath & "\Cantones.txt")
+            Using fileReader As New FileIO.TextFieldParser(Application.StartupPath & "\ATS\Cantones.txt")
                 fileReader.TextFieldType = FileIO.FieldType.Delimited
                 fileReader.SetDelimiters(vbTab)
                 While Not fileReader.EndOfData
@@ -1360,7 +1381,7 @@ Public Class localizacion
                 End While
             End Using
             validArrayList.Clear()
-            Using fileReader As New FileIO.TextFieldParser(Application.StartupPath & "\Formas_Pago.txt")
+            Using fileReader As New FileIO.TextFieldParser(Application.StartupPath & "\ATS\Formas_Pago.txt")
                 fileReader.TextFieldType = FileIO.FieldType.Delimited
                 fileReader.SetDelimiters(vbTab)
                 While Not fileReader.EndOfData
@@ -1870,8 +1891,33 @@ Public Class localizacion
             oValid.descrip = "EXPORTACION DE SERVICIOS U OTROS"
             validArray.Add(oValid)
             UDT_UF.updateUserField(oCompany, "OPCH", "T_EXPORT", validArray)
+
+            validArray.Clear()
+            oValid = Nothing
+            oValid = New validValues
+            oValid.value = "SI"
+            oValid.descrip = "SI"
+            validArray.Add(oValid)
+
+            oValid = Nothing
+            oValid = New validValues
+
+            oValid.value = "NO"
+            oValid.descrip = "NO"
+            validArray.Add(oValid)
+            UDT_UF.updateUserField(oCompany, "OPCH", "IMPUESTO_RENTA", validArray)
             validArray.Clear()
 
+
+
+            Dim oRecordA As SAPbobsCOM.Recordset
+
+
+            oRecordA = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+            oRecordA.DoQuery("INSERT INTO [@INF_APP] VALUES (1,'LOCALIZACION',1.0,'" & Date.Now.ToString("yyy/MM/dd") & "','I')")
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordA)
+            oRecordA = Nothing
+            GC.Collect()
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try
@@ -2071,16 +2117,16 @@ Public Class localizacion
                         Dim oTypeNum = Nothing
                         If fila(8).ToString = "Neto" Then
                             oTypeNum = SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net
-                            SetNewTax(fila(1), fila(3).ToString, SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, Double.Parse(fila(9).ToString), fila(10), "1-1-010-10-001", fila(13).ToString, IIf(fila(7).ToString = "", 0, Double.Parse(fila(7).ToString)))
+                            SetNewTax(fila(1), fila(3).ToString, SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_Net, Double.Parse(fila(9).ToString), fila(10), fila(11), fila(13).ToString, IIf(fila(7).ToString = "", 0, Double.Parse(fila(7).ToString)))
                         ElseIf fila(8).ToString = "IVA" Then
                             SetNewTax(fila(1), fila(3).ToString, SAPbobsCOM.WithholdingTaxCodeCategoryEnum.wtcc_Invoice, SAPbobsCOM.WithholdingTaxCodeBaseTypeEnum.wtcbt_VAT, Double.Parse(fila(9).ToString), fila(10), "1-1-010-10-001", fila(13).ToString, IIf(fila(7).ToString = "", 0, Double.Parse(fila(7).ToString)))
                         End If
 
                     End If
                 Next
-                If My.Computer.FileSystem.FileExists(Application.StartupPath & "\Sustentos.txt") = True And My.Computer.FileSystem.FileExists(Application.StartupPath & "\Comprobantes.txt") = True Then
+                If My.Computer.FileSystem.FileExists(Application.StartupPath & "\ATS\Sustentos.txt") = True And My.Computer.FileSystem.FileExists(Application.StartupPath & "\ATS\Comprobantes.txt") = True Then
                     updateValidValues()
-                End If              
+                End If
             End If
         Catch ex As Exception
             MessageBox.Show(ex.Message)
@@ -2131,8 +2177,42 @@ Public Class localizacion
     End Function
 
     Private Sub PROBAR()
+
+
+        Dim oSales As SAPbobsCOM.Documents
+        Dim erro As Integer = -1
+        Dim ddd As String = ""
+        oSales = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oOrders)
+        oSales.CardCode = "C20000"
+        oSales.CardName = "Norm Thompson"
+        oSales.NumAtCard = "0321555"
+        oSales.DocDate = "2017/05/23"
+        oSales.DocDueDate = "2017/05/23"
+
+
+        oSales.Lines.ItemCode = "A00001"
+        oSales.Lines.Quantity = "3"
+        oSales.Lines.UnitPrice = 23
+        oSales.Lines.TaxCode = "IVA"
+        oSales.Lines.Add()
+
+        oSales.Lines.ItemCode = "A00005"
+        oSales.Lines.Quantity = "5"
+        oSales.Lines.UnitPrice = 23
+        oSales.Lines.TaxCode = "IVA"
+        oSales.Lines.Add()
+
+        oSales.Comments = "prueba daniel moreno"
+
+
+        erro = oSales.Add()
+        If erro <> 0 Then
+            MessageBox.Show(oCompany.GetLastErrorDescription)
+        End If
+
+
         Try
-            Dim InPay As SAPbobsCOM.Payments            
+            Dim InPay As SAPbobsCOM.Payments
             'Dim oDownPay As SAPbobsCOM.Documents
             'oDownPay = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oIncomingPayments)
             Dim sNewObjCode As String = ""

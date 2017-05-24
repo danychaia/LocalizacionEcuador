@@ -377,6 +377,8 @@
             Dim especial As SAPbouiCOM.EditText
             Dim ocantidad As SAPbouiCOM.EditText
             Dim oSistema As SAPbouiCOM.ComboBox
+            Dim oDateIns As SAPbouiCOM.EditText
+
             ocantidad = oForm.Items.Item("Item_3").Specific
             identi = oForm.Items.Item("Item_0").Specific
             conta = oForm.Items.Item("Item_1").Specific
@@ -394,6 +396,7 @@
             contri = oForm.Items.Item("contri").Specific
             especial = oForm.Items.Item("numcte").Specific
             oSistema = oForm.Items.Item("Item_8").Specific
+            oDateIns = oForm.Items.Item("Item_17").Specific
             orecord.DoQuery("select * from [@INF_TRIBUTARIA]")
             If orecord.RecordCount > 0 Then
                 While orecord.EoF = False
@@ -420,12 +423,30 @@
                 End While
             End If
 
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
+            orecord = Nothing
+            GC.Collect()
+            Try
+                orecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                orecord.DoQuery("SELECT ISNULL(A.U_FECHA,'N') FROM  [@INF_APP] A ")
+                oDateIns.Value = orecord.Fields.Item(0).Value.ToString
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
+                orecord = Nothing
+                GC.Collect()
+            Catch ex As Exception
+                System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
+                orecord = Nothing
+                GC.Collect()
+            End Try
+          
+
         Catch ex As Exception
             SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, True)
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
+            orecord = Nothing
+            GC.Collect()
         End Try
-        System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
-        orecord = Nothing
-        GC.Collect()
+       
     End Sub
 
 

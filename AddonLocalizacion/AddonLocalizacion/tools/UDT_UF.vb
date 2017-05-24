@@ -15,6 +15,7 @@
     Public code As String = ""
     Public Totalbase As Double = 0
     Public TotalRetencion As Double = 0
+    Public infoPago As Info_pago = Nothing
 
     Public Property Company() As SAPbobsCOM.Company
         Get

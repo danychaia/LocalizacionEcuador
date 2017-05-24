@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<factura id="comprobante" version="2.0.0">
+  <infoTributaria>
+    <razonSocial />
+    <ruc>0000000000000</ruc>
+    <codDoc>00</codDoc>
+    <estab>000</estab>
+    <ptoEmi>000</ptoEmi>
+    <secuencial>000000000</secuencial>
+    <dirMatriz />
+  </infoTributaria>
+  <infoFactura>
+    <fechaEmision>23/05/2017</fechaEmision>
+    <dirEstablecimiento />
+    <contribuyenteEspecial />
+    <obligadoContabilidad />
+    <tipoIdentificacionComprador />
+    <razonSocialComprador>Earthshaker Corporation</razonSocialComprador>
+    <identificacionComprador />
+    <totalSinImpuestos>412500</totalSinImpuestos>
+    <totalDescuento>0</totalDescuento>
+    <totalConImpuestos>
+      <totalImpuesto>
+        <codigo>2</codigo>
+        <codigoPorcentaje>2</codigoPorcentaje>
+        <baseImponible>412500</baseImponible>
+        <tarifa>12</tarifa>
+        <valor>78375</valor>
+      </totalImpuesto>
+    </totalConImpuestos>
+    <propina>0.00</propina>
+    <importeTotal>490875</importeTotal>
+    <moneda>DOLAR</moneda>
+    <pagos>
+      <pago>
+        <formaPago />
+        <total>490875</total>
+        <plazo>0</plazo>
+        <unidadTiempo>dias</unidadTiempo>
+      </pago>
+    </pagos>
+  </infoFactura>
+  <detalles>
+    <detalle>
+      <codigoPrincipal>A00003</codigoPrincipal>
+      <descripcion>IBM Infoprint 1226</descripcion>
+      <cantidad>2</cantidad>
+      <precioUnitario>206250</precioUnitario>
+      <descuento>0</descuento>
+      <precioTotalSinImpuesto>412500</precioTotalSinImpuesto>
+      <impuestos>
+        <impuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>2</codigoPorcentaje>
+          <tarifa>14</tarifa>
+          <baseImponible>412500</baseImponible>
+          <valor>78375</valor>
+        </impuesto>
+      </impuestos>
+    </detalle>
+  </detalles>
+</factura>

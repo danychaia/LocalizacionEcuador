@@ -7,7 +7,7 @@ Public Class generarFXML
             Dim oRecord As SAPbobsCOM.Recordset
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
 
-            oRecord.DoQuery("exec ENCABEZADO_FACTURA '" & DocEntry & "','13'")
+            oRecord.DoQuery("exec ENCABEZADO_FACTURA '" & DocEntry & "','13'")            
             Dim writer As New XmlTextWriter("Comprobante (F) No." & DocEntry.ToString & ".xml", System.Text.Encoding.UTF8)
             writer.WriteStartDocument(True)
             writer.Formatting = Formatting.Indented
@@ -154,7 +154,7 @@ Public Class generarFXML
             ''Cierre Factura
             writer.WriteEndElement()
             writer.WriteEndDocument()
-            writer.Close()
+            writer.Close()            
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try

@@ -32,6 +32,7 @@
             Else
                 oForm = Me.SBO_Application.Forms.Item("pCliente")
             End If
+            cargarcombo()
         Catch ex As Exception
             SBOApplication.SetStatusBarMessage(ex.Message)
         End Try
@@ -187,12 +188,16 @@
                 Dim txtTotalR As SAPbouiCOM.EditText = oForm.Items.Item("Item_10").Specific
                 Dim txtCliente As SAPbouiCOM.EditText = oForm.Items.Item("1").Specific
                 Dim txtDocumento As SAPbouiCOM.EditText = oForm.Items.Item("Item_3").Specific
+                Dim txtCuentaB As SAPbouiCOM.EditText = oForm.Items.Item("Item_32").Specific
+                Dim txtCuentaR As SAPbouiCOM.EditText = oForm.Items.Item("Item_33").Specific
+
                 Dim orecord As SAPbobsCOM.Recordset
                 orecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
                 If validar(1) = False Then
                     BubbleEvent = False
                     Return
                 End If
+              
                 Dim sql As String = "INF_PAGO_RETENCION '1','" & txtCliente.Value & "','" & txtDocumento.Value & "'," & oBase.Value.Trim & "," & oRetencion.Value & "," & (Double.Parse(oBase.Value) / 100) * Double.Parse(txtBaseImponible.Value) & "," & (IIf(oRetencion.Value.Trim = "", 0, Double.Parse(oRetencion.Value)) / 100) * Double.Parse(Impuesto.Value)
                 orecord.DoQuery(sql)
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
@@ -203,6 +208,8 @@
                 txtTotalR.Value = Double.Parse(RetencionTotal).ToString("N2")
                 BaseTotal = 0
                 RetencionTotal = 0
+                txtCuentaB.Value = oBase.Selected.Description.Trim
+                txtCuentaR.Value = oRetencion.Selected.Description.Trim
                 BubbleEvent = False
                 Return
             End If
@@ -232,15 +239,17 @@
                     Dim txtTotalR As SAPbouiCOM.EditText = oForm.Items.Item("Item_10").Specific
                     Dim txtCuentaB As SAPbouiCOM.EditText = oForm.Items.Item("Item_32").Specific
                     Dim txtCuentaR As SAPbouiCOM.EditText = oForm.Items.Item("Item_33").Specific
-                   
+
                     If validar(3) = False Then
                         BubbleEvent = False
                         Return
                     End If
+                    If UDT_UF.infoPago Is Nothing Then
+                        Dim info As New Inf_pago_retencion
+                        BubbleEvent = False
+                        Return
+                    End If
 
-
-
-                   
                     Dim InPay As SAPbobsCOM.Payments
                     'Dim oDownPay As SAPbobsCOM.Documents
                     'oDownPay = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.oIncomingPayments)                  
@@ -252,30 +261,42 @@
 
                     InPay.Invoices.DocEntry = txtDocumento.Value.Trim
                     InPay.Invoices.InvoiceType = SAPbobsCOM.BoRcptInvTypes.it_Invoice
-                    InPay.Remarks = "Pago de Retencion Localizacion"
+                    InPay.Remarks = UDT_UF.infoPago.remarks
                     If Double.Parse(txtTotalB.Value) > 0 Then
                         InPay.CreditCards.CreditCard = txtCuentaB.Value    ' Mastercard = 1 , VISA = 2
-                        InPay.CreditCards.CardValidUntil = CDate("01/12/2020")
-                        InPay.CreditCards.CreditCardNumber = "1220" ' Just need 4 last digits
+                        InPay.CreditCards.CardValidUntil = UDT_UF.infoPago.validDate
+                        InPay.CreditCards.CreditCardNumber = UDT_UF.infoPago.creditNum  ' Just need 4 last digits
                         InPay.CreditCards.CreditSum = txtTotalB.Value   ' Total Amount of the Invoice
-                        InPay.CreditCards.VoucherNum = "1234567" ' Need to give the Credit Card confirmation number.
-                        InPay.CreditCards.PaymentMethodCode = 1
+                        InPay.CreditCards.VoucherNum = UDT_UF.infoPago.voucher  ' Need to give the Credit Card confirmation number.
+                        Dim orecord As SAPbobsCOM.Recordset
+                        orecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                        orecord.DoQuery("EXEC SP_CUENTA_RETENCIONES 'Pago','" & txtCuentaB.Value & "'")
+                        InPay.CreditCards.PaymentMethodCode = orecord.Fields.Item(0).Value
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
+                        orecord = Nothing
+                        GC.Collect()
                     End If
                     If Double.Parse(txtTotalR.Value) > 0 Then
                         InPay.CreditCards.Add()
                         InPay.CreditCards.CreditCard = txtCuentaR.Value    ' Mastercard = 1 , VISA = 2
-                        InPay.CreditCards.CardValidUntil = CDate("01/12/2020")
-                        InPay.CreditCards.CreditCardNumber = "1220" ' Just need 4 last digits
+                        InPay.CreditCards.CardValidUntil = UDT_UF.infoPago.validDate
+                        InPay.CreditCards.CreditCardNumber = UDT_UF.infoPago.creditNum  ' Just need 4 last digits
                         InPay.CreditCards.CreditSum = Double.Parse(txtTotalR.Value)  ' Total Amount of the Invoice
-                        InPay.CreditCards.VoucherNum = "1234567" ' Need to give the Credit Card confirmation number.
-                        InPay.CreditCards.PaymentMethodCode = 2
+                        InPay.CreditCards.VoucherNum = UDT_UF.infoPago.voucher ' Need to give the Credit Card confirmation number.
+                        Dim orecord As SAPbobsCOM.Recordset
+                        orecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+                        orecord.DoQuery("EXEC SP_CUENTA_RETENCIONES 'Pago','" & txtCuentaB.Value & "'")
+                        InPay.CreditCards.PaymentMethodCode = orecord.Fields.Item(0).Value
+                        System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
+                        orecord = Nothing
+                        GC.Collect()
                     End If
                     InPay.Invoices.SumApplied = Double.Parse(txtTotalR.Value) + Double.Parse(txtTotalB.Value)
                     If InPay.Add() <> 0 Then
-                        SBOApplication.SetStatusBarMessage(oCompany.GetLastErrorDescription, SAPbouiCOM.BoMessageTime.bmt_Short, True)
-                        'MsgBox(oCompany.GetLastErrorDescription())
+                        SBOApplication.SetStatusBarMessage(oCompany.GetLastErrorDescription, SAPbouiCOM.BoMessageTime.bmt_Short, True)                        
                     Else
                         SBOApplication.SetStatusBarMessage("Pago de retencion correcto!", SAPbouiCOM.BoMessageTime.bmt_Short, False)
+                        UDT_UF.infoPago = Nothing
                         oForm.Close()
                     End If
                     BubbleEvent = False
@@ -494,6 +515,44 @@
         Return True
     End Function
 
-   
+    Private Sub cargarcombo()
+        Try
+            Dim oComboFuente As SAPbouiCOM.ComboBox
+            Dim oComboIVA As SAPbouiCOM.ComboBox
+            Dim oRecord As SAPbobsCOM.Recordset
 
+            oComboFuente = oForm.Items.Item("Item_8").Specific
+            oComboIVA = oForm.Items.Item("Item_13").Specific
+
+            oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+            oRecord.DoQuery(" exec SP_CUENTA_RETENCIONES 'Fuente',''")
+            If oRecord.RecordCount > 0 Then
+                oComboFuente.ValidValues.Add("0", "%")
+                While oRecord.EoF = False
+                    oComboFuente.ValidValues.Add(oRecord.Fields.Item(0).Value, oRecord.Fields.Item(1).Value)
+                    oRecord.MoveNext()
+                End While
+            End If
+
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
+            oRecord = Nothing
+            GC.Collect()
+
+            oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+            oRecord.DoQuery(" exec SP_CUENTA_RETENCIONES 'IVA',''")
+
+            If oRecord.RecordCount > 0 Then
+                oComboIVA.ValidValues.Add("0", "%")
+                While oRecord.EoF = False
+                    oComboIVA.ValidValues.Add(oRecord.Fields.Item(0).Value, oRecord.Fields.Item(1).Value)
+                    oRecord.MoveNext()
+                End While
+            End If
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
+            oRecord = Nothing
+            GC.Collect()
+        Catch ex As Exception
+
+        End Try
+    End Sub
 End Class

@@ -77,6 +77,7 @@
     <Compile Include="comprobantes_autorizados.vb" />
     <Compile Include="fact_compro.vb" />
     <Compile Include="guia_remision.vb" />
+    <Compile Include="Inf_pago_retencion.vb" />
     <Compile Include="inf_tributaria.vb" />
     <Compile Include="localizacion.vb" />
     <Compile Include="My Project\AssemblyInfo.vb" />
@@ -103,6 +104,7 @@
     <Compile Include="retencion_numeros.vb" />
     <Compile Include="series.vb" />
     <Compile Include="SubMain.vb" />
+    <Compile Include="tools\generarATS.vb" />
     <Compile Include="tools\generarFEXML.vb" />
     <Compile Include="tools\generarFRXML.vb" />
     <Compile Include="tools\generarFXML.vb" />
@@ -110,6 +112,7 @@
     <Compile Include="tools\generarNCXML.vb" />
     <Compile Include="tools\generarNDXML.vb" />
     <Compile Include="tools\generarRetencionXML.vb" />
+    <Compile Include="tools\Info_pago.vb" />
     <Compile Include="tools\UDT_UF.vb" />
     <Compile Include="tools\validValues.vb" />
     <Compile Include="tools\withHolding.vb" />
