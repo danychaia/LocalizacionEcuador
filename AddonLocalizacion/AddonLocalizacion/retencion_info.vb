@@ -141,12 +141,17 @@
             oForm.DataSources.DataTables.Item(0).ExecuteQuery(sql)
             gridView.DataTable = oForm.DataSources.DataTables.Item("MyDataTable")
             gridView.AutoResizeColumns()
-            gridView.Columns.Item(0).Visible = False
+            gridView.Columns.Item(0).Editable = False
+            Dim oCol As SAPbouiCOM.GridColumn
+
+            oCol = gridView.Columns.Item(0)
+
+            oCol.LinkedObjectType = 18
             gridView.Columns.Item(1).Editable = False
             gridView.Columns.Item(2).Editable = False
             gridView.Columns.Item(3).Editable = False
             gridView.Columns.Item(4).Editable = False
-            gridView.Columns.Item(5).Editable = False
+
             System.Runtime.InteropServices.Marshal.ReleaseComObject(gridView)
             gridView = Nothing
             GC.Collect()

@@ -33,6 +33,8 @@
 
             oMatrix.ClearSelections()
             oMatrix.FlushToDataSource()
+            Dim oSeries As SAPbouiCOM.ComboBox = oForm.Items.Item("Item_33").Specific
+            oSeries.ValidValues.LoadSeries("CPEPOSFE", SAPbouiCOM.BoSeriesMode.sf_View)
         Catch ex As Exception
             SBOApplication.SetStatusBarMessage(ex.Message)
         End Try

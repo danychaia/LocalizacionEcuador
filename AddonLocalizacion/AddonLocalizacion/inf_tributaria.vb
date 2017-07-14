@@ -1,4 +1,6 @@
-﻿Public Class inf_tributaria
+﻿Imports System.Text.RegularExpressions
+
+Public Class inf_tributaria
     Private XmlForm As String = Replace(Application.StartupPath & "\inf_tributaria.srf", "\\", "\")
     Private WithEvents SBO_Application As SAPbouiCOM.Application
     Private oForm As SAPbouiCOM.Form
@@ -122,11 +124,33 @@
                         Me.SBO_Application.SetStatusBarMessage("Debe de seleccionar una Razon", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                         BubbleEvent = False
                         Return
+                    Else
+                        For value As Integer = 0 To razon.Value.Count - 1
+                            If Char.IsLetterOrDigit(razon.Value.ToString.Chars(value)) = False Then
+                                Dim vall = razon.Value.Trim.ToString.Chars(value)
+                                If razon.Value.ToString.Chars(value) <> " "c Then
+                                    Me.SBO_Application.SetStatusBarMessage("Debe de ingresar un valor valido para Razon Comercial ", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                    BubbleEvent = False
+                                    Return
+                                End If
+                            End If
+                        Next
                     End If
                     If nombre.Value.Equals("") Then
                         Me.SBO_Application.SetStatusBarMessage("Debe de seleccionar un Nombre Comercial", SAPbouiCOM.BoMessageTime.bmt_Short, True)
                         BubbleEvent = False
                         Return
+                    Else
+                        For value As Integer = 0 To nombre.Value.Count - 1
+                            If Char.IsLetterOrDigit(nombre.Value.ToString.Chars(value)) = False Then
+                                If nombre.Value.ToString.Chars(value) <> " "c Then
+                                    Me.SBO_Application.SetStatusBarMessage("Debe de ingresar un valor valido para Nombre Comercial ", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                    BubbleEvent = False
+                                    Return
+                                End If
+                                
+                            End If
+                        Next
                     End If
                     If estable.Value.Equals("") Then
                         Me.SBO_Application.SetStatusBarMessage("Debe de seleccionar un establecimiento", SAPbouiCOM.BoMessageTime.bmt_Short, True)
@@ -438,7 +462,7 @@
                 orecord = Nothing
                 GC.Collect()
             End Try
-          
+
 
         Catch ex As Exception
             SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short, True)
@@ -446,7 +470,7 @@
             orecord = Nothing
             GC.Collect()
         End Try
-       
+
     End Sub
 
 

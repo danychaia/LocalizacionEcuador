@@ -72,6 +72,11 @@
             gridView.DataTable = oForm.DataSources.DataTables.Item("MyDataTable")
             gridView.AutoResizeColumns()
             gridView.Columns.Item(0).Editable = False
+            Dim oCol As SAPbouiCOM.GridColumn
+
+            oCol = gridView.Columns.Item(0)
+
+            oCol.LinkedObjectType = 13
             gridView.Columns.Item(1).Editable = False
             gridView.Columns.Item(2).Editable = False
             gridView.Columns.Item(3).Editable = False
@@ -79,7 +84,6 @@
             gridView.Columns.Item(5).Editable = False
             gridView.Columns.Item(6).Editable = False
             gridView.Columns.Item(7).Editable = False
-            gridView.Columns.Item(8).Editable = False
             System.Runtime.InteropServices.Marshal.ReleaseComObject(gridView)
             gridView = Nothing
             GC.Collect()
@@ -101,8 +105,15 @@
                         SBOApplication.SetStatusBarMessage("Debe de seleccionar un rango de fecha", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
                     Else
                         visualizardata(oDe.Value, oHasta.Value)
+                        BubbleEvent = False
+                        Return
                     End If
                 End If
+            End If
+            If pVal.ItemUID = "Item_6" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED And pVal.Before_Action = True Then
+                Dim gridView As SAPbouiCOM.Grid
+                gridView = oForm.Items.Item("Item_6").Specific
+                Dim detalle As New retencion_info_ventas_detalle(gridView.DataTable.GetValue(gridView.DataTable.Columns.Item(0).Name, pVal.Row), gridView.DataTable.GetValue(gridView.DataTable.Columns.Item(1).Name, pVal.Row))
             End If
         Catch ex As Exception
             SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, True)

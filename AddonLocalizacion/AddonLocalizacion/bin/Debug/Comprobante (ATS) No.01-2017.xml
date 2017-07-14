@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<iva version="1.0">
+  <TipoIDInformante>4</TipoIDInformante>
+  <IdInformante>1790015785001</IdInformante>
+  <razonSocial>CONELSA CONDUCTORES ELECTRICOS SA</razonSocial>
+  <numEstabRuc>2</numEstabRuc>
+  <totalVentas>0</totalVentas>
+  <codigoOperativo>IVA</codigoOperativo>
+  <compras />
+  <Ventas />
+  <ventasEstablecimiento />
+  <exportaciones />
+  <anulados />
+</iva>

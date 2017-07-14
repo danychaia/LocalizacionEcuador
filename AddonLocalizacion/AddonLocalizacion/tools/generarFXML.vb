@@ -7,7 +7,7 @@ Public Class generarFXML
             Dim oRecord As SAPbobsCOM.Recordset
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
 
-            oRecord.DoQuery("exec ENCABEZADO_FACTURA '" & DocEntry & "','13'")            
+            oRecord.DoQuery("exec ENCABEZADO_FACTURA '" & DocEntry & "','" & objectType & "'")
             Dim writer As New XmlTextWriter("Comprobante (F) No." & DocEntry.ToString & ".xml", System.Text.Encoding.UTF8)
             writer.WriteStartDocument(True)
             writer.Formatting = Formatting.Indented
@@ -16,15 +16,15 @@ Public Class generarFXML
             writer.WriteAttributeString("id", "comprobante")
             writer.WriteAttributeString("version", "2.0.0")
             writer.WriteStartElement("infoTributaria")
-            createNode("razonSocial", oRecord.Fields.Item(2).Value.ToString, writer)
+            createNode("razonSocial", oRecord.Fields.Item("razonSocial").Value.ToString, writer)
             'createNode("ambiente", oRecord.Fields.Item(0).Value.ToString, writer)
             'createNode("tipoEmision", oRecord.Fields.Item(1).Value.ToString, writer)
-            createNode("ruc", oRecord.Fields.Item(3).Value.ToString.PadLeft(13, "0"), writer)
+            createNode("ruc", oRecord.Fields.Item("ruc").Value.ToString.PadLeft(13, "0"), writer)
             'createNode("claveAcesso", claveAcceso(oRecord).PadLeft(49, "0"), writer)
             'createNode("claveAcesso", "", writer)
             createNode("codDoc", oRecord.Fields.Item("codDoc").Value.ToString.PadLeft(2, "0"), writer)
-            createNode("estab", oRecord.Fields.Item("estable").Value.ToString.PadLeft(3, "0"), writer)
-            createNode("ptoEmi", oRecord.Fields.Item("ptoemi").Value.ToString.PadLeft(3, "0"), writer)
+            createNode("estab", oRecord.Fields.Item("estab").Value.ToString.PadLeft(3, "0"), writer)
+            createNode("ptoEmi", oRecord.Fields.Item("ptoEmi").Value.ToString.PadLeft(3, "0"), writer)
             createNode("secuencial", oRecord.Fields.Item("secuencial").Value.ToString.PadLeft(9, "0"), writer)
             createNode("dirMatriz", oRecord.Fields.Item("dirMatriz").Value.ToString, writer)
             Dim direccion = oRecord.Fields.Item("dirMatriz").Value.ToString
@@ -39,10 +39,12 @@ Public Class generarFXML
 
             writer.WriteStartElement("infoFactura")
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            oRecord.DoQuery("exec SP_INFO_FACTURA '" & DocEntry & "','13'")
+            oRecord.DoQuery("exec SP_INFO_FACTURA '" & DocEntry & "','" & objectType & "'")
             createNode("fechaEmision", Date.Parse(oRecord.Fields.Item("DATE").Value.ToString).ToString("dd/MM/yyyy"), writer)
             createNode("dirEstablecimiento", direccion, writer)
-            createNode("contribuyenteEspecial", oContriEspecial, writer)
+            If oContriEspecial <> "" Then
+                createNode("contribuyenteEspecial", oContriEspecial, writer)
+            End If           
             createNode("obligadoContabilidad", oObliconta, writer)
             createNode("tipoIdentificacionComprador", oRecord.Fields.Item("U_IDENTIFICACION").Value.ToString, writer)
             'createNode("guiaRemision", "", writer)
@@ -59,7 +61,7 @@ Public Class generarFXML
             GC.Collect()
 
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            oRecord.DoQuery("exec SP_Total_Con_Impuesto '" & DocEntry & "','13'")
+            oRecord.DoQuery("exec SP_Total_Con_Impuesto '" & DocEntry & "','" & objectType & "'")
             If oRecord.RecordCount > 0 Then
                 While oRecord.EoF = False
                     writer.WriteStartElement("totalImpuesto")
@@ -84,7 +86,7 @@ Public Class generarFXML
 
             writer.WriteStartElement("pagos")
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            oRecord.DoQuery("exec SP_Forma_Pago '" & DocEntry & "','13'")
+            oRecord.DoQuery("exec SP_Forma_Pago '" & DocEntry & "','" & objectType & "'")
             If oRecord.RecordCount > 0 Then
                 While oRecord.EoF = False
                     writer.WriteStartElement("pago")
@@ -109,7 +111,7 @@ Public Class generarFXML
 
             writer.WriteStartElement("detalles")
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            oRecord.DoQuery("exec SP_DetalleFac '" & DocEntry & "','13'")
+            oRecord.DoQuery("exec SP_DetalleFac '" & DocEntry & "','" & objectType & "'")
 
 
             If oRecord.RecordCount > 0 Then

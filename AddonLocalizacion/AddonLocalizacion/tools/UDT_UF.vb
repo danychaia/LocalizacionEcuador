@@ -166,7 +166,7 @@
         Return existe
     End Function
 
-    Public Sub AddUDOForm(ByVal Company As SAPbobsCOM.Company, ByVal Code As String, ByVal Name As String, ByVal TableName As String, ByVal UDOType As SAPbobsCOM.BoUDOObjType, Optional ByVal ChildTables As List(Of String) = Nothing, Optional ByVal ListFindColumns As List(Of String) = Nothing, Optional ByVal CanCancel As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanClose As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanDelete As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanFind As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanYearTransfer As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES)
+    Public Sub AddUDOForm(ByVal Company As SAPbobsCOM.Company, ByVal Code As String, ByVal Name As String, ByVal TableName As String, ByVal UDOType As SAPbobsCOM.BoUDOObjType, Optional ByVal ChildTables As List(Of String) = Nothing, Optional ByVal ListFindColumns As List(Of String) = Nothing, Optional ByVal CanCancel As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanClose As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanDelete As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanFind As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal CanYearTransfer As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES, Optional ByVal manageSeries As SAPbobsCOM.BoYesNoEnum = SAPbobsCOM.BoYesNoEnum.tYES)
         Dim oUserObjectMD As SAPbobsCOM.UserObjectsMD
 
         Try
@@ -182,6 +182,7 @@
             oUserObjectMD.CanCreateDefaultForm = SAPbobsCOM.BoYesNoEnum.tNO
             oUserObjectMD.CanDelete = CanDelete
             oUserObjectMD.CanFind = CanFind
+            oUserObjectMD.ManageSeries = manageSeries
             'oUserObjectMD.CanYearTransfer = CanYearTransfer
             'oUserObjectMD.ChildTables.TableName = "@ACTF_UBICACIONES"
             oUserObjectMD.Code = Code

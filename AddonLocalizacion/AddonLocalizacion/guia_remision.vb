@@ -40,6 +40,7 @@
             oMatrix.ClearSelections()
             oMatrix.FlushToDataSource()
             UDT_UF.code = ""
+            carcarSeries()
         Catch ex As Exception
             SBOApplication.SetStatusBarMessage(ex.Message)
         End Try
@@ -68,12 +69,12 @@
     End Sub
     Private Sub SBO_Application_ItemEvent(ByVal FormUID As String, ByRef pVal As SAPbouiCOM.ItemEvent, ByRef BubbleEvent As Boolean) Handles SBO_Application.ItemEvent
         If FormUID = "GREMISION_" Then
-            If pVal.ItemUID <> "Item_21" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_CLICK Then
-                Dim txtNoGuia As SAPbouiCOM.EditText = oForm.Items.Item("Item_21").Specific
-                If txtNoGuia.Value.Trim = "" Then
-                    txtNoGuia.Value = UDT_UF.code
-                End If                  
-            End If            
+            'If pVal.ItemUID <> "Item_21" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_CLICK Then
+            'Dim txtNoGuia As SAPbouiCOM.EditText = oForm.Items.Item("Item_21").Specific
+            'If txtNoGuia.Value.Trim = "" Then
+            'txtNoGuia.Value = UDT_UF.code
+            'End If
+            ' End If
             If pVal.EventType = SAPbouiCOM.BoEventTypes.et_CHOOSE_FROM_LIST Then
                 Dim oCFLEvento As SAPbouiCOM.IChooseFromListEvent
                 oCFLEvento = pVal
@@ -131,12 +132,12 @@
         If FormUID = "GREMISION_" And pVal.ItemUID = "Item_35" And pVal.Before_Action = True Then
             oLineSelected = pVal.Row
         End If
-        If pVal.FormTypeEx = "GREMISION" And pVal.ItemUID = "Item_21" And pVal.Before_Action = True And pVal.EventType = SAPbouiCOM.BoEventTypes.et_CLICK Then
+        ' If pVal.FormTypeEx = "GREMISION" And pVal.ItemUID = "Item_21" And pVal.Before_Action = True And pVal.EventType = SAPbouiCOM.BoEventTypes.et_CLICK Then
 
-            Dim numero As New retencion_numeros
-            BubbleEvent = False
-            Return
-        End If
+        ' Dim numero As New retencion_numeros
+        ' BubbleEvent = False
+        ' Return
+        'End If
     End Sub
 
     Private Sub SBO_Application_MenuEvent(ByRef pVal As SAPbouiCOM.MenuEvent, ByRef BubbleEvent As Boolean) Handles SBO_Application.MenuEvent
@@ -168,7 +169,21 @@
     End Sub
 
     Private Sub carcarSeries()
+        Try
+            Dim oRecord As SAPbobsCOM.Recordset
+            Dim oSeries As SAPbouiCOM.ComboBox = oForm.Items.Item("Item_18").Specific
+            oSeries.ValidValues.LoadSeries("GREMISION", SAPbouiCOM.BoSeriesMode.sf_View)
+            'oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
+            'oRecord.DoQuery("SP_SERIES_GUIA_REMISION")
+            'If oRecord.RecordCount > 0 Then
+            'While oRecord.EoF = False
+            'oSeries.ValidValues.Add(oRecord.Fields.Item(0).Value, oRecord.Fields.Item(1).Value)
+            'oRecord.MoveNext()
+            ' End While
+            'End If
+        Catch ex As Exception
 
+        End Try
     End Sub
 
     Private Sub addLine()
@@ -182,8 +197,11 @@
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
             oRecord.DoQuery("EXEC SP_OBTENER_TRANSPORTISTA '" & val & "','1'")
             nombre = oRecord.Fields.Item(0).Value
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
+            oRecord = Nothing
+            GC.Collect()
         Catch ex As Exception
-
+            SBO_Application.SetStatusBarMessage (ex.Message, SAPbouiCOM.BoMessageTime.bmt_Short ,True )
         End Try
         Return nombre
     End Function
@@ -195,6 +213,9 @@
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
             oRecord.DoQuery("EXEC SP_OBTENER_TRANSPORTISTA '" & val & "','2'")
             placa = oRecord.Fields.Item(0).Value
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord)
+            oRecord = Nothing
+            GC.Collect()
         Catch ex As Exception
 
         End Try

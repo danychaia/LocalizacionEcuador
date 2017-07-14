@@ -76,7 +76,9 @@
     <Compile Include="cheques_posfechados.vb" />
     <Compile Include="comprobantes_autorizados.vb" />
     <Compile Include="fact_compro.vb" />
+    <Compile Include="generar_ATS.vb" />
     <Compile Include="guia_remision.vb" />
+    <Compile Include="guia_remision_masiva.vb" />
     <Compile Include="Inf_pago_retencion.vb" />
     <Compile Include="inf_tributaria.vb" />
     <Compile Include="localizacion.vb" />
@@ -101,6 +103,7 @@
     <Compile Include="retencion_info.vb" />
     <Compile Include="retencion_info_detalle.vb" />
     <Compile Include="retencion_info_ventas.vb" />
+    <Compile Include="retencion_info_ventas_detalle.vb" />
     <Compile Include="retencion_numeros.vb" />
     <Compile Include="series.vb" />
     <Compile Include="SubMain.vb" />

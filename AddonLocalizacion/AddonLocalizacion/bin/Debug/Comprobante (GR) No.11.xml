@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<guiaRemision id="comprobante" version="1.1.0">
+  <infoTributaria>
+    <razonSocial>CONELSA CONDUCTORES ELECTRICOS SA</razonSocial>
+    <ruc>1790015785001</ruc>
+    <codDoc>06</codDoc>
+    <estab>000</estab>
+    <ptoEmi>000</ptoEmi>
+    <secuencial>000000000</secuencial>
+    <dirMatriz>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirMatriz>
+  </infoTributaria>
+  <infoGuiaRemision>
+    <dirEstablecimiento>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirEstablecimiento>
+    <dirPartida>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirPartida>
+    <razonSocialTransportista>JUAN PEREZ</razonSocialTransportista>
+    <tipoIdentificacionTransportista>05</tipoIdentificacionTransportista>
+    <rucTransportista>1712228269001</rucTransportista>
+    <obligadoContabilidad>SI</obligadoContabilidad>
+    <contribuyenteEspecial>5368</contribuyenteEspecial>
+    <fechaIniTransporte>30/12/1899 12:00:00 a. m.</fechaIniTransporte>
+    <fechaFinTransporte>30/12/1899 12:00:00 a. m.</fechaFinTransporte>
+    <placa>5656SAS</placa>
+  </infoGuiaRemision>
+  <destinatarios>
+    <destinatario>
+      <identificacionDestinatario>0201413549</identificacionDestinatario>
+      <razonSocialDestinatario>PEÑA PILCO ANGEL</razonSocialDestinatario>
+      <dirDestinatario />
+      <motivoTraslado>1212</motivoTraslado>
+      <codDocSustento>01</codDocSustento>
+      <detalles>
+        <detalle>
+          <codigoInterno>01041303</codigoInterno>
+          <descripcion>TOSCANA MACARRON UNO CT 100GR</descripcion>
+          <cantidad>1</cantidad>
+        </detalle>
+        <detalle>
+          <codigoInterno>01302049</codigoInterno>
+          <descripcion>TOSCANA ESPECIAL CABELLO ROSCA 400GR</descripcion>
+          <cantidad>1</cantidad>
+        </detalle>
+      </detalles>
+    </destinatario>
+  </destinatarios>
+</guiaRemision>

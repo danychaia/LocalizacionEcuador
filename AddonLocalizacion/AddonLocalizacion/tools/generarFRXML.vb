@@ -47,7 +47,9 @@ Public Class generarFRXML
                 oRecord.DoQuery("exec SP_INFO_FACTURA '" & DocEntry & "','FR'")
                 createNode("fechaEmision", Date.Parse(oRecord.Fields.Item("DATE").Value.ToString).ToString("dd/MM/yyyy"), writer)
                 createNode("dirEstablecimiento", direccion, writer)
-                createNode("contribuyenteEspecial", oRecord.Fields.Item(2).Value, writer)
+                If contribuyenteEspecial <> "" Then
+                    createNode("contribuyenteEspecial", contribuyenteEspecial, writer)
+                End If
                 createNode("obligadoContabilidad", oRecord.Fields.Item(3).Value, writer)
                 createNode("tipoIdentificacionComprador", oRecord.Fields.Item("U_IDENTIFICACION").Value.ToString, writer)
                 createNode("razonSocialComprador", oRecord.Fields.Item("CardName").Value.ToString, writer)
@@ -174,7 +176,7 @@ Public Class generarFRXML
                         createNode("codDocReembolso", oRecord.Fields.Item(4).Value.ToString, writer)
                         createNode("estabDocReembolso", oRecord.Fields.Item(5).Value.ToString, writer)
                         createNode("ptoEmiDocReembolso", oRecord.Fields.Item(6).Value.ToString, writer)
-                        createNode("secuencialDocReembolso", oRecord.Fields.Item(7).Value.ToString.PadLeft(9,"0"), writer)
+                        createNode("secuencialDocReembolso", oRecord.Fields.Item(7).Value.ToString.PadLeft(9, "0"), writer)
                         createNode("fechaEmisionDocReembolso", oRecord.Fields.Item(8).Value.ToString, writer)
                         createNode("numeroautorizacionDocReemb", oRecord.Fields.Item(9).Value.ToString, writer)
                         writer.WriteStartElement("detalleImpuestos")
@@ -219,7 +221,7 @@ Public Class generarFRXML
                 oRecord = Nothing
                 GC.Collect()
             End If
-            
+
         Catch ex As Exception
             MessageBox.Show(ex.Message)
         End Try

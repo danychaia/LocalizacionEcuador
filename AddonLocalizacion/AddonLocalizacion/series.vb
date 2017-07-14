@@ -11,7 +11,7 @@
         Try
             Me.SBO_Application = UDT_UF.SBOApplication
             Me.oCompany = UDT_UF.Company
-
+            Dim oDigital As SAPbouiCOM.CheckBox
             If UDT_UF.ActivateFormIsOpen(SBO_Application, "frS") = False Then
                 LoadFromXML(XmlForm)
                 oForm = SBO_Application.Forms.Item("frS")
@@ -40,6 +40,7 @@
                 oHastaI = oForm.Items.Item("Item_11").Specific
                 oNoAutori = oForm.Items.Item("Item_13").Specific
                 oCaducidad = oForm.Items.Item("Item_15").Specific
+                oDigital = oForm.Items.Item("Item_25").Specific
                 oEstable.DataBind.SetBound(True, "", "Date")
                 oPunto.DataBind.SetBound(True, "", "Date2")
                 oHastaI.DataBind.SetBound(True, "", "Hasta")
@@ -47,12 +48,17 @@
                 oCaducidad.DataBind.SetBound(True, "", "Date3")
                 oCombo = oForm.Items.Item("Item_8").Specific
                 oCombo.ValidValues.Add("01", "Electrónico")
-                oCombo.ValidValues.Add("02", "Impreso")               
+                oCombo.ValidValues.Add("02", "Impreso")
+                oForm.DataSources.UserDataSources.Add("ChkPor", SAPbouiCOM.BoDataType.dt_SHORT_TEXT, 1)
+                oDigital = oForm.Items.Item("Item_25").Specific
+                oDigital.DataBind.SetBound(True, "", "ChkPor")
+                oForm.DataSources.UserDataSources.Item("ChkPor").Value = "N"
             Else
                 oForm = Me.SBO_Application.Forms.Item("frS")
             End If
             seriesImpresas()
             carcarSeries()
+           
         Catch ex As Exception
             SBOApplication.SetStatusBarMessage(ex.Message)
         End Try
@@ -81,8 +87,17 @@
     End Sub
     Private Sub SBO_Application_ItemEvent(ByVal FormUID As String, ByRef pVal As SAPbouiCOM.ItemEvent, ByRef BubbleEvent As Boolean) Handles SBO_Application.ItemEvent
         Try
-            If pVal.FormTypeEx = "60004" And pVal.Before_Action = True And pVal.FormUID = "frS" Then
-                If pVal.ItemUID = "Item_5" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED And pVal.Before_Action = True Then
+            If oForm Is Nothing Then
+                Exit Sub
+            End If
+
+            If pVal.EventType = SAPbouiCOM.BoEventTypes.et_FORM_CLOSE And pVal.BeforeAction = True And pVal.FormUID = "frS" Then
+                oForm = Nothing
+                oCompany = Nothing
+                SBO_Application = Nothing
+            End If
+            If pVal.Before_Action = True And pVal.FormUID = "frS" Then
+                If pVal.ItemUID = "Item_5" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED Then
                     Dim obutton As SAPbouiCOM.Button
                     obutton = oForm.Items.Item("Item_5").Specific
                     Dim oSerie As SAPbouiCOM.ComboBox
@@ -91,21 +106,27 @@
                     Dim oDire As SAPbouiCOM.EditText
                     Dim oCiudad As SAPbouiCOM.EditText
                     Dim oTelefono As SAPbouiCOM.EditText
+                    Dim oDigital As SAPbouiCOM.CheckBox
                     oSerie = oForm.Items.Item("Item_24").Specific
                     oNoAutori = oForm.Items.Item("Item_13").Specific
                     oCaducidad = oForm.Items.Item("Item_15").Specific
                     oDire = oForm.Items.Item("Item_18").Specific
                     oCiudad = oForm.Items.Item("Item_21").Specific
                     oTelefono = oForm.Items.Item("Item_23").Specific
+                    oDigital = oForm.Items.Item("Item_25").Specific
+
                     If obutton.Caption.Equals("Agregar") Then
                         Dim sql As String = ""
-                        If oSerie.Value.Trim = "" Or oNoAutori.Value = "" Or oCaducidad.Value = "" Or oDire.Value = "" Or oCiudad.Value = "" Or oTelefono.Value = "" Then
-                            SBOApplication.SetStatusBarMessage("L(821)---Debe de Ingresar toda la información ", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
-                            BubbleEvent = False
-                            Return
+                        If oDigital.Checked = False Then
+                            If oSerie.Value.Trim = "" Or oNoAutori.Value = "" Or oCaducidad.Value = "" Or oDire.Value = "" Or oCiudad.Value = "" Or oTelefono.Value = "" Then
+                                SBOApplication.SetStatusBarMessage("L(821)---Debe de Ingresar toda la información ", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+                                BubbleEvent = False
+                                Exit Sub
+                            End If
                         End If
 
-                        sql = "EXEC SERIES_PTO_ESTABLE '1','" & oSerie.Value.Trim & "','" & oNoAutori.Value & "','" & oCaducidad.Value & "','" & oDire.Value & "','" & oCiudad.Value & "','" & oTelefono.Value.Trim & "'"
+
+                        sql = "EXEC SERIES_PTO_ESTABLE '1','" & oSerie.Value.Trim & "','" & oNoAutori.Value & "','" & oCaducidad.Value & "','" & oDire.Value & "','" & oCiudad.Value & "','" & oTelefono.Value.Trim & "','" & IIf(oDigital.Checked = True, "Y", "N") & "'"
                         Dim orecord As SAPbobsCOM.Recordset
                         orecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
 
@@ -122,44 +143,51 @@
                         System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
                         orecord = Nothing
                         GC.Collect()
+                        BubbleEvent = False
+                        Exit Sub
                     Else
                         If obutton.Caption.Equals("Eliminar") Then
                             If code <> "" Then
                                 Dim orecord As SAPbobsCOM.Recordset
                                 Dim Sql As String
                                 orecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-                                Sql = "EXEC SERIES_PTO_ESTABLE '3','" & code & "','" & oNoAutori.Value & "','" & oCaducidad.Value & "','" & oDire.Value & "','" & oCiudad.Value & "','" & oTelefono.Value.Trim & "'"
-                                orecord.DoQuery(sql)
+                                Sql = "EXEC SERIES_PTO_ESTABLE '3','" & code & "','" & oNoAutori.Value & "','" & oCaducidad.Value & "','" & oDire.Value & "','" & oCiudad.Value & "','" & oTelefono.Value.Trim & "',''"
+                                orecord.DoQuery(Sql)
                                 carcarSeries()
                                 seriesImpresas()
                                 System.Runtime.InteropServices.Marshal.ReleaseComObject(orecord)
                                 orecord = Nothing
                                 GC.Collect()
+                                BubbleEvent = False
+                                Exit Sub
                             Else
                                 SBO_Application.SetStatusBarMessage("Debe de seleccionar una fila", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+                                BubbleEvent = False
+                                Exit Sub
                             End If
                         End If
                     End If
-                
-            End If
-            If pVal.ItemUID = "Item_0" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED And pVal.Before_Action = True Then
-                Dim gridView As SAPbouiCOM.Grid
-                gridView = oForm.Items.Item("Item_0").Specific
-                If pVal.Row <> -1 Then
-                    code = gridView.DataTable.GetValue("Code", pVal.Row).ToString
-                    Dim obutton As SAPbouiCOM.Button
-                    obutton = oForm.Items.Item("Item_5").Specific
-                    obutton.Caption = "Eliminar"
-                    UDT_UF.docEntry = docEntry
-                    'Dim detalle As New retencion_info_detalle
-                    BubbleEvent = False
-                End If
 
-            End If
+                End If
+                If pVal.ItemUID = "Item_0" And pVal.EventType = SAPbouiCOM.BoEventTypes.et_ITEM_PRESSED And pVal.Before_Action = True Then
+                    Dim gridView As SAPbouiCOM.Grid
+                    gridView = oForm.Items.Item("Item_0").Specific
+                    If pVal.Row <> -1 Then
+                        code = gridView.DataTable.GetValue("Code", pVal.Row).ToString
+                        Dim obutton As SAPbouiCOM.Button
+                        obutton = oForm.Items.Item("Item_5").Specific
+                        obutton.Caption = "Eliminar"
+                        UDT_UF.docEntry = docEntry
+                        'Dim detalle As New retencion_info_detalle
+
+                    End If
+
+                End If
                 If (pVal.ItemUID = "Item_24" Or pVal.ItemUID = "Item_4") And pVal.EventType = SAPbouiCOM.BoEventTypes.et_CLICK And pVal.Before_Action = True Then
                     Dim obutton As SAPbouiCOM.Button
                     obutton = oForm.Items.Item("Item_5").Specific
                     obutton.Caption = "Agregar"
+
                 End If
             End If
         Catch ex As Exception
@@ -172,7 +200,7 @@
             Dim gridView As SAPbouiCOM.Grid
             gridView = oForm.Items.Item("Item_0").Specific
             gridView.SelectionMode = SAPbouiCOM.BoMatrixSelect.ms_Single
-            Dim sql As String = "EXEC [SERIES_PTO_ESTABLE] '2','','','','','',''"
+            Dim sql As String = "EXEC [SERIES_PTO_ESTABLE] '2','','','','','','',''"
             oForm.DataSources.DataTables.Item(0).ExecuteQuery(sql)
             gridView.DataTable = oForm.DataSources.DataTables.Item("MyDataTable")
             gridView.AutoResizeColumns()
@@ -184,10 +212,11 @@
             gridView.Columns.Item(5).Editable = False
             gridView.Columns.Item(6).Editable = False
             gridView.Columns.Item(7).Editable = False
-           
+            gridView.Columns.Item(8).Editable = False
             System.Runtime.InteropServices.Marshal.ReleaseComObject(gridView)
             gridView = Nothing
             GC.Collect()
+            Return
         Catch ex As Exception
             Me.SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, False)
         End Try
@@ -206,6 +235,7 @@
             Dim oDire As SAPbouiCOM.EditText
             Dim oCiudad As SAPbouiCOM.EditText
             Dim oTelefono As SAPbouiCOM.EditText
+            Dim oDigital As SAPbouiCOM.CheckBox
             oDe = oForm.Items.Item("Item_2").Specific
             oHasta = oForm.Items.Item("Item_4").Specific
             oCombo = oForm.Items.Item("Item_8").Specific
@@ -217,7 +247,9 @@
             oDire = oForm.Items.Item("Item_18").Specific
             oCiudad = oForm.Items.Item("Item_21").Specific
             oTelefono = oForm.Items.Item("Item_23").Specific
-
+            oDigital = oForm.Items.Item("Item_25").Specific
+            oForm.DataSources.UserDataSources.Item("ChkPor").Value = "N"
+            oDigital.Checked = True
             oDe.Value = ""
             oHasta.Value = ""
             oCombo.Select(0, SAPbouiCOM.BoSearchKey.psk_Index)
@@ -253,6 +285,7 @@
                     oRecord.MoveNext()
                 End While
             End If
+            Return
         Catch ex As Exception
 
         End Try

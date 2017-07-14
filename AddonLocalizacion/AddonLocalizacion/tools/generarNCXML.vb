@@ -45,7 +45,10 @@ Public Class generarNCXML
             createNode("tipoIdentificacionComprador", oRecord.Fields.Item("U_IDENTIFICACION").Value.ToString, writer)
             createNode("razonSocialComprador", oRecord.Fields.Item("CardName").Value.ToString, writer)
             createNode("identificacionComprador", oRecord.Fields.Item("U_DOCUMENTO").Value.ToString, writer)
-            createNode("contribuyenteEspecial", oContriEspecial, writer)
+            If oContriEspecial <> "" Then
+                createNode("contribuyenteEspecial", oContriEspecial, writer)
+            End If
+
             createNode("obligadoContabilidad", oObliconta, writer)
             createNode("codDocModificado", oRecord.Fields.Item("CODIGO_MODIFICADO").Value, writer)
             createNode("numDocModificado", oRecord.Fields.Item("DocModifi").Value, writer)

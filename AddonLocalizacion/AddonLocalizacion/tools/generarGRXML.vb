@@ -42,7 +42,9 @@ Public Class generarGRXML
             createNode("tipoIdentificacionTransportista", oRecord.Fields.Item(1).Value.ToString, writer)
             createNode("rucTransportista", oRecord.Fields.Item(2).Value.ToString, writer)
             createNode("obligadoContabilidad", oObliconta, writer)
-            createNode("contribuyenteEspecial", oContriEspecial, writer)
+            If oContriEspecial <> "" Then
+                createNode("contribuyenteEspecial", oContriEspecial, writer)
+            End If
 
             'createNode("guiaRemision", "", writer)
             createNode("fechaIniTransporte", oRecord.Fields.Item(3).Value.ToString, writer)

@@ -21,15 +21,15 @@ Public Class generarFEXML
             writer.WriteAttributeString("id", "comprobante")
             writer.WriteAttributeString("version", "2.0.0")
             writer.WriteStartElement("infoTributaria")
-            createNode("razonSocial", oRecord.Fields.Item(2).Value.ToString, writer)
+            createNode("razonSocial", oRecord.Fields.Item("razonSocial").Value.ToString, writer)
             'createNode("ambiente", oRecord.Fields.Item(0).Value.ToString, writer)
             'createNode("tipoEmision", oRecord.Fields.Item(1).Value.ToString, writer)
-            createNode("ruc", oRecord.Fields.Item(3).Value.ToString.PadLeft(13, "0"), writer)
+            createNode("ruc", oRecord.Fields.Item("ruc").Value.ToString.PadLeft(13, "0"), writer)
             'createNode("claveAcesso", claveAcceso(oRecord).PadLeft(49, "0"), writer)
             'createNode("claveAcesso", "", writer)
             createNode("codDoc", oRecord.Fields.Item("codDoc").Value.ToString.PadLeft(2, "0"), writer)
-            createNode("estab", oRecord.Fields.Item("estable").Value.ToString.PadLeft(3, "0"), writer)
-            createNode("ptoEmi", oRecord.Fields.Item("ptoemi").Value.ToString.PadLeft(3, "0"), writer)
+            createNode("estab", oRecord.Fields.Item("estab").Value.ToString.PadLeft(3, "0"), writer)
+            createNode("ptoEmi", oRecord.Fields.Item("ptoEmi").Value.ToString.PadLeft(3, "0"), writer)
             createNode("secuencial", oRecord.Fields.Item("secuencial").Value.ToString.PadLeft(9, "0"), writer)
             createNode("dirMatriz", oRecord.Fields.Item("dirMatriz").Value.ToString, writer)
             Dim direccion = oRecord.Fields.Item("dirMatriz").Value.ToString
@@ -46,7 +46,10 @@ Public Class generarFEXML
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
             oRecord.DoQuery("exec SP_INFO_FACTURA '" & DocEntry & "','13E'")
             createNode("fechaEmision", Date.Parse(oRecord.Fields.Item("DATE").Value.ToString).ToString("dd/MM/yyyy"), writer)
-            createNode("contribuyenteEspecial", contribuyenteEspecial, writer)
+            If contribuyenteEspecial <> "" Then
+                createNode("contribuyenteEspecial", contribuyenteEspecial, writer)
+            End If
+
             createNode("obligadoContabilidad", obliConta, writer)
             createNode("comercioExterior", "EXPORTADOR", writer)
             createNode("incoTermFactura", oRecord.Fields.Item("U_INCO_TERM").Value, writer)

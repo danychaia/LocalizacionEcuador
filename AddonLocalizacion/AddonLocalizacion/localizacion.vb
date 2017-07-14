@@ -179,6 +179,8 @@ Public Class localizacion
 
             UDT_UF.SBOApplication = Me.SBO_Application
             UDT_UF.Company = Me.oCompany
+            'Dim facturaNueva As New generarRetencionXML
+            'facturaNueva.generaXML("39", "RTNC", oCompany, SBOApplication)
             ' PROBAR()
             Dim oRecord As SAPbobsCOM.Recordset
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
@@ -306,6 +308,11 @@ Public Class localizacion
             oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING
             oCreationPackage.UniqueID = "GRe"
             oCreationPackage.String = "Guía de Remisión"
+            oMenus.AddEx(oCreationPackage)
+
+            oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING
+            oCreationPackage.UniqueID = "guiM"
+            oCreationPackage.String = "Guía de Remisión Masiva"
             oMenus.AddEx(oCreationPackage)
 
             oCreationPackage.Type = SAPbouiCOM.BoMenuType.mt_STRING
@@ -689,6 +696,76 @@ Public Class localizacion
                 BubbleEvent = False
                 Return
             End If
+
+            If pVal.FormUID = "T_GTRANSPORTISTA_" And pVal.ItemUID = "1" And pVal.BeforeAction = True And pVal.FormMode = 2 Then
+                Dim myForm = SBO_Application.Forms.GetForm(pVal.FormTypeEx, pVal.FormTypeCount)
+                Dim validar As Boolean = False
+                Dim oRuc As SAPbouiCOM.EditText
+                oRuc = myForm.Items.Item("Item_1").Specific
+
+                Try
+                    Double.Parse(oRuc.Value.Trim)
+                Catch ex As Exception
+                    SBOApplication.SetStatusBarMessage("El número de RUC/CI es incorrecto", SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+                    BubbleEvent = False
+                    Return
+                End Try
+
+                If oRuc.Value.Trim.Count = 13 Then
+                    Dim claserum = Integer.Parse(oRuc.Value.ToString.Chars(2))
+                    If claserum = 6 Then
+                        If digitoVerificadorPublico(oRuc.Value, Me.SBO_Application, False) = False Then
+                            Me.SBO_Application.SetStatusBarMessage("RUC no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                            BubbleEvent = False
+                            Return
+                        End If
+                    Else
+                        If claserum = 9 Then
+                            If digitoVerificador(oRuc.Value.Trim, Me.SBO_Application, False) = False Then
+                                Me.SBO_Application.SetStatusBarMessage("RUC no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                BubbleEvent = False
+                                Return
+                            End If
+                        Else
+                            If digitoVerificadorIndividual(oRuc.Value, Me.SBO_Application, False) = False Then
+                                Me.SBO_Application.SetStatusBarMessage("RUC no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                BubbleEvent = False
+                                Return
+                            End If
+                        End If
+                    End If
+                Else
+                    If oRuc.Value.Trim.Count = 10 Then
+                        Dim claseci = Integer.Parse(oRuc.Value.ToString.Chars(2))
+                        If claseci = 6 Then
+                            If digitoVerificadorPublico(oRuc.Value, Me.SBO_Application, True) = False Then
+                                Me.SBO_Application.SetStatusBarMessage("C.I. no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                BubbleEvent = False
+                                Return
+                            End If
+                        Else
+                            If claseci = 9 Then
+                                If digitoVerificador(oRuc.Value, Me.SBO_Application, True) = False Then
+                                    Me.SBO_Application.SetStatusBarMessage("C.I. no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                    BubbleEvent = False
+                                    Return
+                                End If
+                            Else
+                                If digitoVerificadorIndividual(oRuc.Value, Me.SBO_Application, True) = False Then
+                                    Me.SBO_Application.SetStatusBarMessage("C.I. no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                                    BubbleEvent = False
+                                    Return
+                                End If
+                            End If
+                        End If
+                    Else
+                        Me.SBO_Application.SetStatusBarMessage("C.I/RUC no válido", SAPbouiCOM.BoMessageTime.bmt_Short, True)
+                        BubbleEvent = False
+                        Return
+                    End If
+                End If
+                Return
+            End If
         Catch ex As Exception
             SBO_Application.SetStatusBarMessage(ex.Message, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
         End Try
@@ -801,6 +878,11 @@ Public Class localizacion
             Dim Guia As New guia_remision
             BubbleEvent = False
         End If
+
+        If (pVal.MenuUID = "guiM") And (pVal.BeforeAction = False) Then
+            Dim GuiaMasiva As New guia_remision_masiva
+            BubbleEvent = False
+        End If
         If (pVal.MenuUID = "infCl") And (pVal.BeforeAction = False) Then
             Dim infoCliente As New retencion_cliente
             BubbleEvent = False
@@ -810,12 +892,14 @@ Public Class localizacion
             BubbleEvent = False
         End If
 
+
+
         If (pVal.MenuUID = "infTri") And (pVal.BeforeAction = False) Then
             Dim inf As New inf_tributaria
             BubbleEvent = False
         End If
         If (pVal.MenuUID = "rete") And (pVal.BeforeAction = False) Then
-            Dim rete As New retencion
+            Dim oATS As New generar_ATS
             BubbleEvent = False
         End If
         If (pVal.MenuUID = "rinfo") And (pVal.BeforeAction = False) Then
@@ -851,7 +935,7 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "OCRD", "País al que Efectúa el Pago", 45, "PAIS_PAGO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OCRD", "Aplica Conveninio de Doble Tributación", 25, "D_TRIBUTACION", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             UDT_UF.userField(oCompany, "OCRD", "No. Documento", 45, "DOCUMENTO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBO_Application)
-            UDT_UF.userField(oCompany, "OCRD", "Sujeto a Retención", 25, "SUJE_RETENCION", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
+            UDT_UF.userField(oCompany, "OCRD", "Pago Ext. Sujeto a Retención", 25, "SUJE_RETENCION", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
 
 
 
@@ -919,15 +1003,15 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "@GREMISION", "No. DOCUMENTO", 30, "N_DOCUMENTO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION", "PUNTO DE LLEGADA", 30, "PTO_LLEGADA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION", "PUNTO DE PARTIDA", 30, "PTO_PARTIDA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "@GREMISION", "FECHA INICIO TRASLADO", 30, "F_ITRASLADO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "@GREMISION", "FECHA FIN TRASLADO", 30, "F_FTRASLADO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "FECHA INICIO TRASLADO", 30, "F_ITRASLADO", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "FECHA FIN TRASLADO", 30, "F_FTRASLADO", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION", "GUIA TRASPORTISTA FINAL", 30, "G_TFINAL", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION", "CONSECUTIVO", 30, "CONSECUTIVO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION", "RUC TRANSPORTISTA", 30, "G_TRANSPOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION", "TRANSPORTISTA", 60, "TRANPORTISTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION", "PLACA", 30, "PLACA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION", "BIENES TRANSPORTADOS", 30, "B_TRANS", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "@GREMISION", "FECHA ENVIO", 30, "F_ENVIO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION", "FECHA ENVIO", 30, "F_ENVIO", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION", "RUTA", 30, "G_RUTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
 
             'Guia de remision detalle
@@ -979,6 +1063,18 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "@P_RETENCION", "RETENCION", 20, "RETENCION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@P_RETENCION", "TOTAL BASE", 20, "T_BASE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@P_RETENCION", "RETENCION", 20, "T_RETENCION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@P_RETENCION", "CUENTAB", 12, "CUENTAB", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@P_RETENCION", "CUENTAR", 12, "CUENTAR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@P_RETENCION", "ESTADO", 3, "ESTADO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+
+            UDT_UF.userTable(oCompany, "INFP_RETENCION", "INFO. PAGO RETENCION", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObjectAutoIncrement, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INFP_RETENCION", "AUTORIZACION", 60, "AUTORIZACION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INFP_RETENCION", "NUMEROA", 13, "NUMEROA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INFP_RETENCION", "FECHAR", 10, "FECHAR", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INFP_RETENCION", "FECHAC", 10, "FECHAC", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INFP_RETENCION", "CLIENTE", 30, "CLIENTE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@INFP_RETENCION", "DOCUMENTO", 10, "DOCUMENTO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+
 
             UDT_UF.userTable(oCompany, "SERIES", "INFORMACION AUTORIZACIONES", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObject, False, SBOApplication)
             UDT_UF.userField(oCompany, "@SERIES", "SERIE", 3, "SERIE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
@@ -986,7 +1082,8 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "@SERIES", "FECHA CADUCIDAD", 45, "FECHA_CADU", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@SERIES", "DIRECION", 70, "DIRECCION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@SERIES", "CIUDAD", 70, "CIUDAD", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "@SERIES", "TELEFONO", 70, "TELEFONO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)            
+            UDT_UF.userField(oCompany, "@SERIES", "TELEFONO", 70, "TELEFONO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@SERIES", "DIGITAL", 10, "DIGITAL", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
 
 
 
@@ -998,11 +1095,14 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "OINV", "Forma de Pago", 60, "FORMA_PAGO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OINV", "Número de Autorización", 60, "NO_AUTORI", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Número de Retención", 45, "RETENCION_NO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Número de autorizacion Retencion", 60, "NA_RETENCION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Fecha de Retención", 60, "F_RETENCION", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Aplicar Retención", 6, "A_APLICARR", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             ' Notas de crédito y de debtito
             UDT_UF.userField(oCompany, "OPCH", "Doc. Modificado", 45, "D_MODIFICADO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "OPCH", "Fecha Doc. Modificado", 45, "F_MODIFICADO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Fecha Doc. Modificado", 45, "F_MODIFICADO", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Tipo Comprobante Doc. Modificado", 5, "T_COMPROBANTEM", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Número Autorización Doc. Modificado", 60, "N_AUTORIZACIONM", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
 
             'Factura de Exportación
             UDT_UF.userField(oCompany, "OPCH", "Tipo de Exportación", 3, "T_EXPORT", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
@@ -1010,7 +1110,7 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "OPCH", "Impuesto a la Renta o Similar Ext", 25, "IMPUESTO_RENTA", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Valor IR o Similar en el Ext", 25, "V_IR_SIMI", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Fecha Embarque", 25, "F_EMBARQUE", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
-            UDT_UF.userField(oCompany, "OPCH", "Valor FOB", 25, "V_FOB", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Valor FOB", 25, "V_FOB", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Número de Transporte Ext.", 13, "N_TRASNPORT", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Distrito Aduanero", 13, "D_ADUANERO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Año", 13, "ANO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
@@ -1026,18 +1126,19 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "OPCH", "Pais Destino", 45, "PAIS_DESTINO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "País Adquisición", 45, "PAIS_ADQUISION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "IncoTerm Total SinImpuestos", 45, "TERM_TOT_SIN_IMPUESTO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "OPCH", "Flete Internacional", 45, "FLETE_INTERNA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "OPCH", "Seguro Internacional", 45, "SEGURO_INTERNA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "OPCH", "Gastos Aduaneros", 45, "GASTOS_ADUANEROS", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            UDT_UF.userField(oCompany, "OPCH", "Gastos Transporte", 45, "G_TRANS_OTROS", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Flete Internacional", 45, "FLETE_INTERNA", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Seguro Internacional", 45, "SEGURO_INTERNA", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Gastos Aduaneros", 45, "GASTOS_ADUANEROS", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Gastos Transporte", 45, "G_TRANS_OTROS", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Guia Remision", 45, "G_REMISION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Transportista", 60, "TRANSPORTISTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+
 
             UDT_UF.userField(oCompany, "OPCH", "Fecha pago Dividendo", 60, "P_DIVIDENDO", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "Año Dividendo", 6, "A_DIVIDENDO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "OPCH", "IR Asoc. Dividendo", 4, "IR_DIVIDENDO", SAPbobsCOM.BoFieldTypes.db_Numeric, False, SBOApplication)
-            UDT_UF.userField(oCompany, "OPCH", "Cant. Caja Banano", 4, "C_BANANO", SAPbobsCOM.BoFieldTypes.db_Numeric, False, SBOApplication)
-            UDT_UF.userField(oCompany, "OPCH", "Precio Caja Banano", 4, "PC_BANANO", SAPbobsCOM.BoFieldTypes.db_Numeric, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Cant. Caja Banano", 4, "C_BANANO", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OPCH", "Precio Caja Banano", 4, "PC_BANANO", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
 
             'CAMPOS PARA FACTURA DE REEEMBOLSO
             UDT_UF.userField(oCompany, "PCH1", "Tipo de Identificación  ", 13, "T_IDENTIFICACION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
@@ -1060,9 +1161,11 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "PCH1", "TIPO PROVEEDOR ", 13, "T_PROVEEDOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "PCH1", "PAIS PROVEEDOR", 13, "PA_PROVEEDOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "PCH1", "ID PROVEEDOR REEMBOLSO ", 13, "ID_PROVEEDOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-
-
-
+            UDT_UF.userField(oCompany, "OACT", "RUC de Banco  ", 13, "RUC_BANCO ", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OACT", "Cuenta  de Retención", 13, "CUENTA_RET ", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
+            UDT_UF.userField(oCompany, "OJDT", "Aplica para ATS ", 13, "APLICA_ATS", SAPbobsCOM.BoFieldTypes.db_Alpha, True, SBOApplication)
+            UDT_UF.userField(oCompany, "OITM", "ICE por Unidad", 13, "ICE_UNIDAD", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
+            UDT_UF.userField(oCompany, "OITM", "Codigo ICE", 6, "ICE_CODIGO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
 
             'GUIA DE REMISION MASIVA ENCABEZADO
             UDT_UF.userTable(oCompany, "GREMISION_M", "GUIA DE REMISION MASIVA", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_Document, False, SBOApplication)
@@ -1070,11 +1173,14 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "@GREMISION_M", "PUNTO PARTIDA", 30, "P_PARTIDA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION_M", "TRANSPORTISTA", 30, "R_TRANSPORTISTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION_M", "RAZON TRANSPORTISTA", 30, "RA_TRANSPORTISTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "CLIENTE", 30, "CLIENTE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION_M", "PLACA", 30, "PLACA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION_M", "FECHA INICIAL", 30, "F_INICIAL", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION_M", "FECHA FINAL", 30, "F_FINAL", SAPbobsCOM.BoFieldTypes.db_Date, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION_M", "TIPO DOCUMENTO", 30, "T_DOCUMENTO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "@GREMISION_M", "MOTIVO TRASLADO", 60, "MOTIVO_TRASLADO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "FACTURA DESDE", 60, "FACDE", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "@GREMISION_M", "FACTURA HASTA", 60, "FACHASTA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
 
             UDT_UF.userTable(oCompany, "G_ULTIMO", "PAGO RETENCION", 45, "NULL", SAPbobsCOM.BoUTBTableType.bott_NoObjectAutoIncrement, False, SBOApplication)
             UDT_UF.userField(oCompany, "@G_ULTIMO", "ID GUIA", 13, "DOCENTRY", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
@@ -1108,7 +1214,7 @@ Public Class localizacion
 
 
             'UDT_UF.userField(oCompany, "OPCH", "SECUENCIAL", 3, "PTO_EMISION", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
-            ''  updateValidValues()
+            ''updateValidValues()
         Catch ex As Exception
             ex.Message.ToString()
             MessageBox.Show(ex.Message)
@@ -1325,6 +1431,27 @@ Public Class localizacion
             End Using
 
             Using fileReader As New FileIO.TextFieldParser(Application.StartupPath & "\ATS\Comprobantes.txt")
+                fileReader.TextFieldType = FileIO.FieldType.Delimited
+                fileReader.SetDelimiters(vbTab)
+                While Not fileReader.EndOfData
+                    Dim currentLine As String() = fileReader.ReadFields()
+                    If currentLine(0).ToString = "Comprobantes" And currentLine(1).ToString = "OPCH" Then
+                        tabla = currentLine(1).ToString
+                        campo = currentLine(2).ToString
+                    Else
+                        Dim oValidV As New validValues
+                        oValidV.value = currentLine(0).ToString
+                        oValidV.descrip = currentLine(1).ToString
+                        validArrayList.Add(oValidV)
+                        If currentLine(3).ToString = "fin" Then
+                            UDT_UF.updateUserField(oCompany, tabla, campo, validArrayList)
+                            validArrayList.Clear()
+                        End If
+                    End If
+                End While
+            End Using
+
+            Using fileReader As New FileIO.TextFieldParser(Application.StartupPath & "\ATS\ComprobantesModi.txt")
                 fileReader.TextFieldType = FileIO.FieldType.Delimited
                 fileReader.SetDelimiters(vbTab)
                 While Not fileReader.EndOfData
@@ -1910,6 +2037,51 @@ Public Class localizacion
 
 
 
+
+            validArray.Clear()
+
+            oValid = Nothing
+            oValid = New validValues
+            oValid.value = "No Aplica"
+            oValid.descrip = "No Aplica"
+            validArray.Add(oValid)
+
+            oValid = Nothing
+            oValid = New validValues
+
+            oValid.value = "RENTA"
+            oValid.descrip = "RENTA"
+            validArray.Add(oValid)
+
+
+            oValid = Nothing
+            oValid = New validValues
+
+            oValid.value = "IVA"
+            oValid.descrip = "IVA"
+            validArray.Add(oValid)
+
+            UDT_UF.updateUserField(oCompany, "OACT", "CUENTA_RET", validArray)
+
+
+
+            validArray.Clear()
+
+            oValid = Nothing
+            oValid = New validValues
+            oValid.value = "01"
+            oValid.descrip = "SI"
+            validArray.Add(oValid)
+
+            oValid = Nothing
+            oValid = New validValues
+
+            oValid.value = "02"
+            oValid.descrip = "NO"
+            validArray.Add(oValid)
+
+            UDT_UF.updateUserField(oCompany, "OJDT", "APLICA_ATS", validArray)
+
             Dim oRecordA As SAPbobsCOM.Recordset
 
 
@@ -2158,6 +2330,13 @@ Public Class localizacion
             findCols.Add("Docentry")
             findCols.Add("DocNum")
             UDT_UF.AddUDOForm(Me.oCompany, "CPEPOSFE", "CHEQUE POSFECHADO", "CPEPOSFE", SAPbobsCOM.BoUDOObjType.boud_Document, ChildTables, findCols)
+
+            ChildTables.Clear()            
+            findCols.Clear()
+            findCols.Add("DocEntry")
+            findCols.Add("DocNum")
+            UDT_UF.AddUDOForm(Me.oCompany, "GREMISION_M", "GUIA DE REMISION MASIVA", "GREMISION_M", SAPbobsCOM.BoUDOObjType.boud_Document, ChildTables, findCols)
+
         Catch ex As Exception
 
         End Try
