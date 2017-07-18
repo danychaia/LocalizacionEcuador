@@ -217,7 +217,9 @@ Public Class generarRetencionXML
                 oRecord.DoQuery("exec SP_INFO_FACTURA '" & DocEntry & "','RTNC'")
                 createNode("fechaEmision", Date.Parse(oRecord.Fields.Item("DocDate").Value.ToString).ToString("dd/MM/yyyy"), writer)
                 createNode("dirEstablecimiento", direccion, writer)
-                createNode("contribuyenteEspecial", contribuyenteEspecial, writer)
+                If contribuyenteEspecial <> "" Then
+                    createNode("contribuyenteEspecial", contribuyenteEspecial, writer)
+                End If
                 createNode("obligadoContabilidad", obliConta, writer)
                 createNode("tipoIdentificacionSujetoRetenido", oRecord.Fields.Item("U_IDENTIFICACION").Value.ToString, writer)
                 createNode("razonSocialSujetoRetenido", oRecord.Fields.Item("CardName").Value.ToString, writer)

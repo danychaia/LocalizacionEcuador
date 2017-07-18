@@ -105,10 +105,12 @@ Public Class generarATS
                 createNode("valorRetRenta", oRecord.Fields.Item("valorRetRenta").Value, writer)
 
                 oRecord2 = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-                oRecord2.DoQuery("exec ATS_formasDePago " & ano & "," & mes & ",'" & oRecord.Fields.Item("tipoComprobante").Value & "','" & oRecord.Fields.Item("idCliente").Value & "'")
+                Dim sql = "exec ATS_formasDePago " & ano & "," & mes & ",'" & oRecord.Fields.Item("tipoComprobante").Value & "','" & oRecord.Fields.Item("idCliente").Value & "'"
+                oRecord2.DoQuery(sql)
                 writer.WriteStartElement("formasDePago")
                 While oRecord2.EoF = False
                     createNode("formaPago", oRecord2.Fields.Item("formaPago").Value, writer)
+                    oRecord2.MoveNext()
                 End While
                 System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecord2)
                 oRecord2 = Nothing
@@ -126,7 +128,7 @@ Public Class generarATS
             GC.Collect()
 
             oRecord = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-            oRecord.DoQuery("exec ATS_ventasEstablecimiento " & mes & "," & ano)
+            oRecord.DoQuery("exec ATS_ventasEstablecimiento " & ano & "," & mes)
             writer.WriteStartElement("ventasEstablecimiento")
             While oRecord.EoF = False
                 writer.WriteStartElement("ventaEst")
@@ -206,7 +208,7 @@ Public Class generarATS
 
     Private Sub DetalleCompras(oRecord As SAPbobsCOM.Recordset, oCompany As SAPbobsCOM.Company, application As SAPbouiCOM.Application, writer As XmlTextWriter, ano As String, mes As String)
         createNode("codSustento", oRecord.Fields.Item("CodSustento").Value, writer)
-        createNode("tpldProv", oRecord.Fields.Item("tpldProv").Value, writer)
+        createNode("tpIdProv", oRecord.Fields.Item("tpIdProv").Value, writer)
         createNode("idProv", oRecord.Fields.Item("idProv").Value, writer)
         createNode("tipoComprobante", oRecord.Fields.Item("tipoComprobante").Value, writer)
         createNode("parteRel", oRecord.Fields.Item("parteRel").Value, writer)
@@ -227,46 +229,37 @@ Public Class generarATS
         createNode("valorRetBienes", oRecord.Fields.Item("valRetServ20").Value, writer)
         createNode("ValorRetServicios", oRecord.Fields.Item("ValorRetServicios").Value, writer)
         'createNode("valRetServ50", oRecord.Fields.Item("ValorRetServicios").Value, writer)
-        createNode("valRetServ100", oRecord.Fields.Item("valRetServ100").Value, writer)
+        createNode("valRetServ100", oRecord.Fields.Item("ValorRetServ100").Value, writer)
         createNode("totbasesImpReemb", oRecord.Fields.Item("totbasesImpReemb").Value, writer)
 
         writer.WriteStartElement("pagoExterior")
-        createNode("pagoLocExt", "", writer)
-        createNode("paisEfecPago", "", writer)
-        createNode("aplicConvDobTrib", "", writer)
-        createNode("pagExtSujRetNorLeg", "", writer)
+        createNode("pagoLocExt", oRecord.Fields.Item("pagoLocExt").Value, writer)
+        createNode("paisEfecPago", oRecord.Fields.Item("paisEfecPago").Value, writer)
+        createNode("aplicConvDobTrib", oRecord.Fields.Item("aplicConvDobTrib").Value, writer)
+        createNode("pagExtSujRetNorLeg", oRecord.Fields.Item("pagExtSujRetNorLeg").Value, writer)
         'Fin pago exterior
         writer.WriteEndElement()
         'EMPIEZA FORMAS DE PAGO PARA COMPRAS
         Dim oRecordP As SAPbobsCOM.Recordset
-        oRecordP = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
-        oRecordP.DoQuery("EXEC ATS_formasDePago " & ano & "," & mes & ",'" & oRecord.Fields.Item("tipoComprobante").Value & "','" & oRecord.Fields.Item("tipoComprobante").Value & "'")
-        writer.WriteStartElement("formasDePago")
-        While oRecordP.EoF
-            createNode("formaPago", oRecordP.Fields.Item("formaPago").Value, writer)
-            oRecordP.MoveNext()
-        End While
-        'final forma de pago 
-        writer.WriteEndElement()
-        System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordP)
-        oRecordP = Nothing
-        GC.Collect()
-
 
         'DETALLE AIR PARA COMPRAS 
         oRecordP = oCompany.GetBusinessObject(SAPbobsCOM.BoObjectTypes.BoRecordset)
         oRecordP.DoQuery("EXEC ATS_Air " & oRecord.Fields.Item("DocEntry").Value)
-
-        While oRecordP.RecordCount
+        If oRecordP.RecordCount > 0 Then
             writer.WriteStartElement("air")
-            writer.WriteStartElement("detalleAir")
-            createNode("codRetAir", oRecordP.Fields.Item("codRetAir").Value, writer)
-            createNode("baseImpAir", oRecordP.Fields.Item("baseImpAir").Value, writer)
-            createNode("porcentajeAir", oRecordP.Fields.Item("porcentajeAir").Value, writer)
-            createNode("valRetAir", oRecordP.Fields.Item("valRetAir").Value, writer)
-            'Fin detalle Air
+            While oRecordP.EoF = False
+                writer.WriteStartElement("detalleAir")
+                createNode("codRetAir", oRecordP.Fields.Item("codRetAir").Value, writer)
+                createNode("baseImpAir", oRecordP.Fields.Item("baseImpAir").Value, writer)
+                createNode("porcentajeAir", oRecordP.Fields.Item("porcentajeAir").Value, writer)
+                createNode("valRetAir", oRecordP.Fields.Item("valRetAir").Value, writer)
+                'Fin detalle Air
+                writer.WriteEndElement()
+                oRecordP.MoveNext()
+            End While
             writer.WriteEndElement()
-        End While
+        End If
+       
         System.Runtime.InteropServices.Marshal.ReleaseComObject(oRecordP)
         oRecordP = Nothing
         GC.Collect()
@@ -280,7 +273,7 @@ Public Class generarATS
     Private Sub detalleExportaciones(oRecord As SAPbobsCOM.Recordset, oCompany As SAPbobsCOM.Company, application As SAPbouiCOM.Application, writer As XmlTextWriter, ano As String, mes As String)
         createNode("tpIdClienteEx", oRecord.Fields.Item("tpIdClienteEx").Value, writer)
         createNode("idClienteEx", oRecord.Fields.Item("idClienteEx").Value, writer)
-        createNode("parteRelExp", oRecord.Fields.Item("parteRelExp").Value, writer)
+        createNode("parteRelExp", oRecord.Fields.Item("parteRel").Value, writer)
         createNode("tipoRegi", oRecord.Fields.Item("tipoRegi").Value, writer)
         createNode("paisEfecPagoGen", oRecord.Fields.Item("paisEfecPagoGen").Value, writer)
         createNode("paisEfecExp", oRecord.Fields.Item("paisEfecExp").Value, writer)

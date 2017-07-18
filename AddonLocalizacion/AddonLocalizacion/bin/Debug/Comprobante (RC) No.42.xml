@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<comprobanteRetencion id="comprobante" version="1.0.0">
+  <infoTributaria>
+    <razonSocial>CONELSA CONDUCTORES ELECTRICOS SA</razonSocial>
+    <ruc>1790015785001</ruc>
+    <codDoc>07</codDoc>
+    <estab>001</estab>
+    <ptoEmi>005</ptoEmi>
+    <secuencial>1100000034</secuencial>
+    <dirMatriz>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirMatriz>
+  </infoTributaria>
+  <infoCompRetencion>
+    <fechaEmision>18/07/2017</fechaEmision>
+    <dirEstablecimiento>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirEstablecimiento>
+    <contribuyenteEspecial>5368</contribuyenteEspecial>
+    <obligadoContabilidad>SI</obligadoContabilidad>
+    <tipoIdentificacionSujetoRetenido>04</tipoIdentificacionSujetoRetenido>
+    <razonSocialSujetoRetenido>INCREMAR CIA LTDA</razonSocialSujetoRetenido>
+    <identificacionSujetoRetenido>0190123251001</identificacionSujetoRetenido>
+    <periodoFiscal>07/2017</periodoFiscal>
+  </infoCompRetencion>
+  <impuestos>
+    <impuesto>
+      <codigo>1</codigo>
+      <codigoRetencion>312</codigoRetencion>
+      <baseImponible>56</baseImponible>
+      <porcentajeRetener>1</porcentajeRetener>
+      <valorRetenido>0.56</valorRetenido>
+      <codDocSustento>1</codDocSustento>
+      <numDocSustento>0010051100000034</numDocSustento>
+      <fechaEmisionDocSustento>18/07/2017</fechaEmisionDocSustento>
+    </impuesto>
+  </impuestos>
+</comprobanteRetencion>

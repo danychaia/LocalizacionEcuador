@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<factura id="comprobante" version="2.0.0">
+  <infoTributaria>
+    <razonSocial>CONELSA CONDUCTORES ELECTRICOS SA</razonSocial>
+    <ruc>1790015785001</ruc>
+    <codDoc>01</codDoc>
+    <estab>001</estab>
+    <ptoEmi>002</ptoEmi>
+    <secuencial>000000005</secuencial>
+    <dirMatriz>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirMatriz>
+  </infoTributaria>
+  <infoFactura>
+    <fechaEmision>18/07/2017</fechaEmision>
+    <contribuyenteEspecial>5368</contribuyenteEspecial>
+    <obligadoContabilidad>SI</obligadoContabilidad>
+    <comercioExterior>EXPORTADOR</comercioExterior>
+    <incoTermFactura>0</incoTermFactura>
+    <lugarIncoTerm>prueba</lugarIncoTerm>
+    <paisOrigen>prueba</paisOrigen>
+    <puertoEmbarque>jj</puertoEmbarque>
+    <puertoDestino>kkk</puertoDestino>
+    <paisDestino>501</paisDestino>
+    <paisAdquisicion>501</paisAdquisicion>
+    <tipoIdentificacionComprador>05</tipoIdentificacionComprador>
+    <razonSocialComprador>SANTOS XAVIER</razonSocialComprador>
+    <identificacionComprador>0906659081</identificacionComprador>
+    <direccionComprador>PREUBAPREUBA</direccionComprador>
+    <totalSinImpuestos>251.00</totalSinImpuestos>
+    <incoTermTotalSinImpuestos>0</incoTermTotalSinImpuestos>
+    <totalDescuento>0.00</totalDescuento>
+    <totalConImpuestos>
+      <totalImpuesto>
+        <codigo>2</codigo>
+        <codigoPorcentaje>0</codigoPorcentaje>
+        <baseImponible>251</baseImponible>
+        <tarifa>0</tarifa>
+        <valor>0</valor>
+      </totalImpuesto>
+    </totalConImpuestos>
+    <propina>0.00</propina>
+    <fleteInternacional>2011</fleteInternacional>
+    <seguroInternacional>0</seguroInternacional>
+    <gastosAduaneros>0</gastosAduaneros>
+    <gastosTransporteOtros>0</gastosTransporteOtros>
+    <importeTotal>251</importeTotal>
+    <moneda>DOLAR</moneda>
+    <pagos>
+      <pago>
+        <formaPago>01</formaPago>
+        <total>251</total>
+        <plazo>30</plazo>
+        <unidadTiempo>dias</unidadTiempo>
+      </pago>
+    </pagos>
+  </infoFactura>
+  <detalles>
+    <detalle>
+      <codigoPrincipal>000002</codigoPrincipal>
+      <descripcion>TOSCANA MACARRON UNO CT 400GR</descripcion>
+      <cantidad>1</cantidad>
+      <precioUnitario>215</precioUnitario>
+      <descuento>0</descuento>
+      <precioTotalSinImpuesto>215</precioTotalSinImpuesto>
+      <impuestos>
+        <impuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>0</codigoPorcentaje>
+          <tarifa>0</tarifa>
+          <baseImponible>215</baseImponible>
+          <valor>0</valor>
+        </impuesto>
+      </impuestos>
+    </detalle>
+    <detalle>
+      <codigoPrincipal>000003</codigoPrincipal>
+      <descripcion>TOSCANA MACARRON UNO CT 400GR</descripcion>
+      <cantidad>1</cantidad>
+      <precioUnitario>36</precioUnitario>
+      <descuento>0</descuento>
+      <precioTotalSinImpuesto>36</precioTotalSinImpuesto>
+      <impuestos>
+        <impuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>0</codigoPorcentaje>
+          <tarifa>0</tarifa>
+          <baseImponible>36</baseImponible>
+          <valor>0</valor>
+        </impuesto>
+      </impuestos>
+    </detalle>
+  </detalles>
+</factura>

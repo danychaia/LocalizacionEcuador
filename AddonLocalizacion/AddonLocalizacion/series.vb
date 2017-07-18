@@ -135,7 +135,7 @@
                             SBO_Application.SetStatusBarMessage("Serie creada Correctamente", SAPbouiCOM.BoMessageTime.bmt_Medium, False)
                             limpiar()
                         Else
-                            SBO_Application.SetStatusBarMessage(orecord.Fields.Item(0).Value.ToString, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
+                            ' SBO_Application.SetStatusBarMessage(orecord.Fields.Item(0).Value.ToString, SAPbouiCOM.BoMessageTime.bmt_Medium, True)
                         End If
 
                         carcarSeries()

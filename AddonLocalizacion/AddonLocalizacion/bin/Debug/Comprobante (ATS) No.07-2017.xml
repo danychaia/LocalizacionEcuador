@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<iva version="1.0">
+  <TipoIDInformante>4</TipoIDInformante>
+  <IdInformante>1790015785001</IdInformante>
+  <razonSocial>CONELSA CONDUCTORES ELECTRICOS SA</razonSocial>
+  <numEstabRuc>2</numEstabRuc>
+  <totalVentas>752.88</totalVentas>
+  <codigoOperativo>IVA</codigoOperativo>
+  <compras>
+    <detalleCompras>
+      <codSustento>1</codSustento>
+      <tpIdProv>01</tpIdProv>
+      <idProv>0190123251001</idProv>
+      <tipoComprobante>1</tipoComprobante>
+      <parteRel>SI</parteRel>
+      <fechaRegistro>18/07/2017</fechaRegistro>
+      <establecimiento>898</establecimiento>
+      <puntoEmision>456</puntoEmision>
+      <secuencial>565655555</secuencial>
+      <fechaEmision>18/07/2017</fechaEmision>
+      <autorizacion>2315656565</autorizacion>
+      <baseNoGraIva>0</baseNoGraIva>
+      <baseImponible>0</baseImponible>
+      <baseImpGrav>56</baseImpGrav>
+      <baseImpExe>0</baseImpExe>
+      <montoIce>0</montoIce>
+      <montoIva>7.84</montoIva>
+      <valRetBien10>0</valRetBien10>
+      <valRetServ20>0</valRetServ20>
+      <valorRetBienes>0</valorRetBienes>
+      <ValorRetServicios>0</ValorRetServicios>
+      <valRetServ100>0</valRetServ100>
+      <totbasesImpReemb>0</totbasesImpReemb>
+      <pagoExterior>
+        <pagoLocExt>01</pagoLocExt>
+        <paisEfecPago>NA</paisEfecPago>
+        <aplicConvDobTrib>NA</aplicConvDobTrib>
+        <pagExtSujRetNorLeg>NA</pagExtSujRetNorLeg>
+      </pagoExterior>
+      <air>
+        <detalleAir>
+          <codRetAir>312</codRetAir>
+          <baseImpAir>56</baseImpAir>
+          <porcentajeAir>1</porcentajeAir>
+          <valRetAir>0.56</valRetAir>
+        </detalleAir>
+      </air>
+      <estabRetencion1>001</estabRetencion1>
+      <ptoEmiRetencion1>001</ptoEmiRetencion1>
+      <secRetencion1>021235321</secRetencion1>
+      <autRetencion1>12:00:00 a. m.</autRetencion1>
+      <fechaEmiRet1>18/07/2017</fechaEmiRet1>
+    </detalleCompras>
+  </compras>
+  <Ventas>
+    <detalleVentas>
+      <tpIdCliente>05</tpIdCliente>
+      <idCliente>0906659081</idCliente>
+      <denoCli>SANTOS XAVIER</denoCli>
+      <tipoComprobante>18</tipoComprobante>
+      <tipoEmision>F</tipoEmision>
+      <numeroComprobantes>1</numeroComprobantes>
+      <baseNoGraIva>0</baseNoGraIva>
+      <baseImponible>752.88</baseImponible>
+      <baseImpGrav>0</baseImpGrav>
+      <montoIva>0</montoIva>
+      <montoIce>0</montoIce>
+      <valorRetIva>0</valorRetIva>
+      <valorRetRenta>0</valorRetRenta>
+      <formasDePago>
+        <formaPago>01</formaPago>
+      </formasDePago>
+    </detalleVentas>
+  </Ventas>
+  <ventasEstablecimiento>
+    <ventaEst>
+      <codEstab>001</codEstab>
+      <ventasEstab>752.88</ventasEstab>
+      <ivaCompe>0</ivaCompe>
+    </ventaEst>
+  </ventasEstablecimiento>
+  <exportaciones>
+    <detalleExportaciones>
+      <tpIdClienteEx>02</tpIdClienteEx>
+      <idClienteEx>0906659081</idClienteEx>
+      <parteRelExp>SI</parteRelExp>
+      <tipoRegi />
+      <paisEfecPagoGen>NA</paisEfecPagoGen>
+      <paisEfecExp />
+      <exportacionDe>01</exportacionDe>
+      <tipoComprobante />
+      <distAduanero>555</distAduanero>
+      <anio>2017</anio>
+      <regimen>23</regimen>
+      <docTransp />
+      <fechaEmbarque>12:00:00 a. m.</fechaEmbarque>
+      <valorFOB>566</valorFOB>
+      <valorFOBComprobante>251</valorFOBComprobante>
+      <establecimiento>001</establecimiento>
+      <puntoEmision>001</puntoEmision>
+      <autorizacion />
+      <fechaEmision>18/07/2017</fechaEmision>
+    </detalleExportaciones>
+  </exportaciones>
+  <anulados />
+</iva>

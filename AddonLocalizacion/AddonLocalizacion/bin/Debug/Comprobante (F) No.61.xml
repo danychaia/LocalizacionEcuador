@@ -1,0 +1,79 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<factura id="comprobante" version="2.0.0">
+  <infoTributaria>
+    <razonSocial>CONELSA CONDUCTORES ELECTRICOS SA</razonSocial>
+    <ruc>1790015785001</ruc>
+    <codDoc>01</codDoc>
+    <estab>001</estab>
+    <ptoEmi>005</ptoEmi>
+    <secuencial>1100000047</secuencial>
+    <dirMatriz>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirMatriz>
+  </infoTributaria>
+  <infoFactura>
+    <fechaEmision>18/07/2017</fechaEmision>
+    <dirEstablecimiento>Juan Barrezueta N69-147 y Pana. Norte Km. 5 1/2</dirEstablecimiento>
+    <contribuyenteEspecial>5368</contribuyenteEspecial>
+    <obligadoContabilidad>SI</obligadoContabilidad>
+    <tipoIdentificacionComprador>07</tipoIdentificacionComprador>
+    <razonSocialComprador>SANTOS XAVIER</razonSocialComprador>
+    <identificacionComprador />
+    <totalSinImpuestos>752.88</totalSinImpuestos>
+    <totalDescuento>0</totalDescuento>
+    <totalConImpuestos>
+      <totalImpuesto>
+        <codigo>2</codigo>
+        <codigoPorcentaje>0</codigoPorcentaje>
+        <baseImponible>752.88</baseImponible>
+        <tarifa>0</tarifa>
+        <valor>0</valor>
+      </totalImpuesto>
+    </totalConImpuestos>
+    <propina>0.00</propina>
+    <importeTotal>752.88</importeTotal>
+    <moneda>DOLAR</moneda>
+    <pagos>
+      <pago>
+        <formaPago>01</formaPago>
+        <total>752.88</total>
+        <plazo>30</plazo>
+        <unidadTiempo>dias</unidadTiempo>
+      </pago>
+    </pagos>
+  </infoFactura>
+  <detalles>
+    <detalle>
+      <codigoPrincipal>000002</codigoPrincipal>
+      <descripcion>TOSCANA MACARRON UNO CT 400GR</descripcion>
+      <cantidad>1</cantidad>
+      <precioUnitario>683.22</precioUnitario>
+      <descuento>0</descuento>
+      <precioTotalSinImpuesto>683.22</precioTotalSinImpuesto>
+      <impuestos>
+        <impuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>0</codigoPorcentaje>
+          <tarifa>0</tarifa>
+          <baseImponible>683.22</baseImponible>
+          <valor>0</valor>
+        </impuesto>
+      </impuestos>
+    </detalle>
+    <detalle>
+      <codigoPrincipal>000003</codigoPrincipal>
+      <descripcion>TOSCANA MACARRON UNO CT 400GR</descripcion>
+      <cantidad>1</cantidad>
+      <precioUnitario>69.66</precioUnitario>
+      <descuento>0</descuento>
+      <precioTotalSinImpuesto>69.66</precioTotalSinImpuesto>
+      <impuestos>
+        <impuesto>
+          <codigo>2</codigo>
+          <codigoPorcentaje>0</codigoPorcentaje>
+          <tarifa>0</tarifa>
+          <baseImponible>69.66</baseImponible>
+          <valor>0</valor>
+        </impuesto>
+      </impuestos>
+    </detalle>
+  </detalles>
+</factura>

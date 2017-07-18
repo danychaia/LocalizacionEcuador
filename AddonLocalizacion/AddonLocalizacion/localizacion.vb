@@ -913,6 +913,7 @@ Public Class localizacion
         If (pVal.MenuUID = "ss") And (pVal.BeforeAction = False) Then
             Dim series As New series
             BubbleEvent = False
+            Return
         End If
         If (pVal.MenuUID = "rinv") And (pVal.BeforeAction = False) Then
             Dim ventas As New retencion_info_ventas
@@ -1154,7 +1155,7 @@ Public Class localizacion
             UDT_UF.userField(oCompany, "PCH1", "Base imponible tarifa IVA diferente de 0% ", 6, "BASE_12", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
             UDT_UF.userField(oCompany, "PCH1", "Base imponible no objeto de IVA", 6, "IVA_NOBJETOREEM", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
             UDT_UF.userField(oCompany, "PCH1", "Base imponible exenta de IVA ", 6, "B_EXENTA_REEM", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
-            UDT_UF.userField(oCompany, "PCH1", "Monto IVA ", 11, "MONTO_IVA", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
+            UDT_UF.userField(oCompany, "PCH1", "Monto IVA ", 11, "MONTO_IVA", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
             UDT_UF.userField(oCompany, "PCH1", "Monto ICE ", 11, "MONTO_ICE", SAPbobsCOM.BoFieldTypes.db_Float, False, SBOApplication)
             UDT_UF.userField(oCompany, "PCH1", "Motivo", 60, "MOTIVO", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
             UDT_UF.userField(oCompany, "PCH1", "Guia de Proveedor", 11, "GUIA_PROVEEDOR", SAPbobsCOM.BoFieldTypes.db_Alpha, False, SBOApplication)
